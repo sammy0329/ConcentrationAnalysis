@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 from host import *
 from client import *
 
+
 mainform_class = uic.loadUiType('./ui/main.ui')[0]
 
 class MyWindow(QMainWindow, mainform_class):

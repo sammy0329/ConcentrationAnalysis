@@ -9,9 +9,9 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 #----------------------------------------
-import test23.client as client
+# import test23.client as client
 import socket
-from ConcentrationGraph import *
+from test_graph import *
 
 
 # form_class = uic.loadUiType('./ui/test1.ui')[0]
@@ -27,7 +27,6 @@ client_info=[]
 
 hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
-
 
 
 class Clientclass(QThread):
@@ -46,8 +45,6 @@ class Clientclass(QThread):
                 self.client_info.append(each)
             self.timeout.emit(self.client_info)
             
-            
-                      
             time.sleep(3)
       
 # class Host_window(QMainWindow, form_class):  
@@ -82,6 +79,14 @@ class Host_window(QWidget, form_class):
     def tableWidget_doubleClicked(self):
         row = self.client_table.currentIndex().row()
         column = self.client_table.currentIndex().column()
+        # self.Graph_layout.removeItem()
+
+        
+        myGUI = CustomMainWindow()
+        #어떻게 widget을 없애지?
+    
+
+        self.Graph_layout.addWidget(myGUI.myFig)
         print(row, column)
     
     
