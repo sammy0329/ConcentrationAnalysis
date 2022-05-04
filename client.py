@@ -21,7 +21,7 @@ class Client_info_window(QWidget, client_info_form_class):
     def button_commit(self):
         self.hide()
         self.client_window=Client_window()
-        
+         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     myWindow = Client_info_window()

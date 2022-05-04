@@ -11,8 +11,10 @@ from PyQt5.QtCore import *
 #----------------------------------------
 # import test23.client as client
 import socket
-from test_graph import *
 
+from scipy import rand
+from test_graph import *
+import random
 
 # form_class = uic.loadUiType('./ui/test1.ui')[0]
 # form_class = uic.loadUiType('./ui/test_graph.ui')[0]
@@ -24,7 +26,8 @@ cred = credentials.Certificate(key_path)
 firebase_admin.initialize_app(cred, {'databaseURL' : db_url})
 dir = db.reference()
 client_info=[]
-
+# exlist=[80,90,100,70,60,50,40,60,65,55,75,84,55,43,78]
+exlist=[]
 hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
 
@@ -92,12 +95,37 @@ class Host_window(QWidget, form_class):
     
     @pyqtSlot(list)
     def timeout(self, client_info):
+        
         self.client_table.setRowCount(len(client_info))
         self.client_table.setColumnCount(5)
+        #애초에 소팅 설정해두면 에러가 나서 끊어주고 데이터 넣고 다시 True로 바꿔줌.
+        self.client_table.setSortingEnabled(False)
         for i in range(len(client_info)):
+            a=random.randint(1,100)
+            #집중도 숫자로 표현
+            item_refresh = QTableWidgetItem()
+            # item_refresh.setData(Qt.DisplayRole, int(exlist[i])) #숫자로 설정 (정렬을 위해)
+            item_refresh.setData(Qt.DisplayRole, a)
+
+            #집중도에 따른 색상 변경
+            if a>60:
+                item_refresh.setForeground(QBrush(QColor(50, 205, 50)))
+                item_refresh.setFont(QFont("Arial", 10))
+            elif a>40:
+                item_refresh.setForeground(QBrush(QColor(247 , 230, 0)))
+                item_refresh.setFont(QFont("Arial", 10))
+            else:
+                item_refresh.setForeground(QBrush(QColor(255, 0, 0)))
+                # item_refresh.setFont(QFont("Times", 7, QFont.Bold))
+                item_refresh.setFont(QFont("Arial", 10, QFont.Bold))
+
+
+            self.client_table.setItem(i,1, item_refresh)
+
             self.client_table.setItem(i,0,QTableWidgetItem(client_info[i]))
-      
-    
+        
+        self.client_table.setSortingEnabled(True)
+            
 if __name__ =='__main__':
     app = QApplication(sys.argv)
     host_window = Host_window()
