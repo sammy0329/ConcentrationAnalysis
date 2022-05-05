@@ -88,6 +88,11 @@ class Host_window(QWidget, form_class):
         myGUI = CustomMainWindow()
         #어떻게 widget을 없애지?
     
+        #layout 내부 그래프 삭제
+        for i in reversed(range(self.Graph_layout.count())):
+            # print(self.Graph_layout.itemAt(i))
+            self.Graph_layout.removeItem(self.Graph_layout.itemAt(i))
+
 
         self.Graph_layout.addWidget(myGUI.myFig)
         print(row, column)
