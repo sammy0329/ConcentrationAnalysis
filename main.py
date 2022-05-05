@@ -24,8 +24,15 @@ class MyWindow(QMainWindow, mainform_class):
 
     def button_client(self):
         self.hide()
-        self.client_info_window=Client_info_window()
         
+        text, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Server IP:')
+
+        if ok:
+            # self.le.setText(str(text))
+            self.client_info_window=Client_info_window()
+        else:
+            self.show()
+
 if __name__ =='__main__':
     app = QApplication(sys.argv)
     mywindow = MyWindow()

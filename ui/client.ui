@@ -6,80 +6,80 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>466</width>
-    <height>488</height>
+    <width>574</width>
+    <height>513</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QScrollArea" name="Client_cam">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>30</x>
      <y>60</y>
-     <width>421</width>
-     <height>411</height>
+     <width>511</width>
+     <height>421</height>
     </rect>
    </property>
-   <property name="widgetResizable">
-    <bool>true</bool>
-   </property>
-   <widget class="QWidget" name="scrollAreaWidgetContents">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>419</width>
-      <height>409</height>
-     </rect>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="image_label">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="control_bt">
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
-  <widget class="QSplitter" name="splitter">
+  <widget class="QSplitter" name="splitter_3">
    <property name="geometry">
     <rect>
-     <x>21</x>
+     <x>31</x>
      <y>20</y>
-     <width>201</width>
+     <width>511</width>
      <height>20</height>
     </rect>
    </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-   <widget class="QLabel" name="label">
-    <property name="text">
-     <string>학번:</string>
+   <widget class="QSplitter" name="splitter">
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
     </property>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>학번:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="StudentID_label">
+     <property name="text">
+      <string>2017204033</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QLabel" name="StudentID_label">
-    <property name="text">
-     <string>2017204033</string>
+   <widget class="QSplitter" name="splitter_2">
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
     </property>
-   </widget>
-  </widget>
-  <widget class="QSplitter" name="splitter_2">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>20</y>
-     <width>201</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <widget class="QLabel" name="label_2">
-    <property name="text">
-     <string>이름:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="Name_label">
-    <property name="text">
-     <string>안성재</string>
-    </property>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>이름:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Name_label">
+     <property name="text">
+      <string>안성재</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>

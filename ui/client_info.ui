@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>382</width>
-    <height>156</height>
+    <width>365</width>
+    <height>150</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QPushButton" name="commit_btn">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>120</y>
-     <width>75</width>
-     <height>23</height>
+     <x>140</x>
+     <y>100</y>
+     <width>81</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -30,31 +30,14 @@
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>30</y>
-     <width>292</width>
-     <height>71</height>
+     <y>29</y>
+     <width>264</width>
+     <height>61</height>
     </rect>
    </property>
    <property name="orientation">
     <enum>Qt::Vertical</enum>
    </property>
-   <widget class="QSplitter" name="splitter">
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <family>휴먼모음T</family>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string> IP: </string>
-     </property>
-    </widget>
-    <widget class="QPlainTextEdit" name="plainTextEdit"/>
-   </widget>
    <widget class="QSplitter" name="splitter_2">
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -70,7 +53,7 @@
       <string>학번: </string>
      </property>
     </widget>
-    <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+    <widget class="QLineEdit" name="StudentNumber_text"/>
    </widget>
    <widget class="QSplitter" name="splitter_3">
     <property name="orientation">
@@ -87,7 +70,7 @@
       <string>이름: </string>
      </property>
     </widget>
-    <widget class="QPlainTextEdit" name="plainTextEdit_3"/>
+    <widget class="QLineEdit" name="Name_text"/>
    </widget>
   </widget>
  </widget>

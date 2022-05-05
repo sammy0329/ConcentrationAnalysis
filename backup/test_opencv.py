@@ -1,45 +1,108 @@
 import cv2
 import sys
-from PyQt5.QtWidgets import  QWidget, QLabel, QApplication
-from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QImage, QPixmap
-
-class Thread(QThread):
-    changePixmap = pyqtSignal(QImage)
-
-    def run(self):
-        cap = cv2.VideoCapture(0)
-        while True:
-            ret, frame = cap.read()
-            if ret:
-                # https://stackoverflow.com/a/55468544/6622587
-                rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                h, w, ch = rgbImage.shape
-                bytesPerLine = ch * w
-                convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
-                p = convertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
-                self.changePixmap.emit(p)
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 
 
-class App(QWidget):
-    def __init__(self):
-        super().__init__()
+class ShowVideo(QtCore.QObject):
 
-        self.initUI()
+    flag = 0
 
-    @pyqtSlot(QImage)
-    def setImage(self, image):
-        self.label.setPixmap(QPixmap.fromImage(image))
+    camera = cv2.VideoCapture(0)
+
+    ret, image = camera.read()
+    height, width = image.shape[:2]
+
+    VideoSignal1 = QtCore.pyqtSignal(QtGui.QImage)
+    VideoSignal2 = QtCore.pyqtSignal(QtGui.QImage)
+
+    def __init__(self, parent=None):
+        super(ShowVideo, self).__init__(parent)
+
+    @QtCore.pyqtSlot()
+    def startVideo(self):
+        global image
+
+        run_video = True
+        while run_video:
+            ret, image = self.camera.read()
+            color_swapped_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+            qt_image1 = QtGui.QImage(color_swapped_image.data,
+                                    self.width,
+                                    self.height,
+                                    color_swapped_image.strides[0],
+                                    QtGui.QImage.Format_RGB888)
+            self.VideoSignal1.emit(qt_image1)
+
+
+           
+
+
+            loop = QtCore.QEventLoop()
+            QtCore.QTimer.singleShot(25, loop.quit) #25 ms
+            loop.exec_()
+
+
+
+class ImageViewer(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(ImageViewer, self).__init__(parent)
+        self.image = QtGui.QImage()
+        self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.drawImage(0, 0, self.image)
+        self.image = QtGui.QImage()
 
     def initUI(self):
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
-        self.resize(1800, 1200)
-        # create a label
-        self.label = QLabel(self)
-        self.label.move(280, 120)
-        self.label.resize(640, 480)
-        th = Thread(self)
-        th.changePixmap.connect(self.setImage)
-        th.start()
-        self.show()
+        self.setWindowTitle('Test')
+
+    @QtCore.pyqtSlot(QtGui.QImage)
+    def setImage(self, image):
+        if image.isNull():
+            print("Viewer Dropped frame!")
+
+        self.image = image
+        if image.size() != self.size():
+            self.setFixedSize(image.size())
+        self.update()
+
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+
+
+    thread = QtCore.QThread()
+    thread.start()
+    vid = ShowVideo()
+    vid.moveToThread(thread)
+
+    image_viewer1 = ImageViewer()
+
+
+    vid.VideoSignal1.connect(image_viewer1.setImage)
+    
+
+    push_button1 = QtWidgets.QPushButton('Start')
+    
+    push_button1.clicked.connect(vid.startVideo)
+ 
+
+    vertical_layout = QtWidgets.QVBoxLayout()
+    horizontal_layout = QtWidgets.QHBoxLayout()
+    horizontal_layout.addWidget(image_viewer1)
+
+    vertical_layout.addLayout(horizontal_layout)
+    vertical_layout.addWidget(push_button1)
+  
+
+    layout_widget = QtWidgets.QWidget()
+    layout_widget.setLayout(vertical_layout)
+
+    main_window = QtWidgets.QMainWindow()
+    main_window.setCentralWidget(layout_widget)
+    main_window.show()
+    sys.exit(app.exec_())
