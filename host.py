@@ -13,7 +13,7 @@ from PyQt5.QtCore import *
 import socket
 
 from scipy import rand
-from test_graph import *
+from graph import *
 import random
 
 # form_class = uic.loadUiType('./ui/test1.ui')[0]
