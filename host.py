@@ -10,11 +10,14 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 #----------------------------------------
 # import test23.client as client
-import socket
+from socket import *
+from threading import *
+import base64
 
 from scipy import rand
 from graph import *
 import random
+import cv2
 
 # form_class = uic.loadUiType('./ui/test1.ui')[0]
 # form_class = uic.loadUiType('./ui/test_graph.ui')[0]
@@ -30,7 +33,8 @@ client_info=[]
 exlist=[]
 hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
-
+clients = [] #클라이언트 리스트
+sockets = [] #소켓 리스트
 
 class Clientclass(QThread):
     timeout = pyqtSignal(list)    # 사용자 정의 시그널
@@ -88,11 +92,6 @@ class Host_window(QWidget, form_class):
         myGUI = CustomMainWindow()
         #어떻게 widget을 없애지?
     
-        #layout 내부 그래프 삭제
-        for i in reversed(range(self.Graph_layout.count())):
-            # print(self.Graph_layout.itemAt(i))
-            self.Graph_layout.removeItem(self.Graph_layout.itemAt(i))
-
 
         self.Graph_layout.addWidget(myGUI.myFig)
         print(row, column)
@@ -130,7 +129,42 @@ class Host_window(QWidget, form_class):
             self.client_table.setItem(i,0,QTableWidgetItem(client_info[i]))
         
         self.client_table.setSortingEnabled(True)
+
+class MainServer :
+    
+    def __init__(self) :
+        self.s_sock = socket(AF_INET, SOCK_STREAM)
+        self.ip = ""
+        self.port = 2500 #우선 포트 번호 2500으로 고정. 나중에 수정 가능
+        self.s_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) #다중 접속 방지
+        self.s_sock.bind((self.ip, self.port)) #ip와 port를 바인드
+        print("클라이언트 대기 중...")
+        self.s_sock.listen(100) #접속자 100명까지
+        self.accept_client()
+        
+    def accept_client(self) : #클라이언트가 접속할 때 실행되는 함수
+        while True :
+            student_client = c_socket, (ip, port) = self.s_sock.accept()
+            if student_client not in clients :
+                clients.append(student_client) #클라이언트 리스트에 클라이언트가 없다면 추가
+                
+            print(ip + " : " + str(port) + "가 연결되었습니다.")
             
+            self.show_address(ip, port)
+    
+    def show_address(self, ip, port) : #호스트 채팅창에 ip와 port, 이름을 보여준다. 
+        info_message = ("{} : {} 가 연결되었습니다.".format(ip, port))
+        message_text = QTextBrowser()
+        message_text.setPlainText(info_message)
+        
+    def send_signal(self, socket) : #표 더블 클릭을 했을 때 클라이언트에게 시그널을 보내 영상을 요청한다.
+        signal_message = "1"
+        socket.send(signal_message.encode('utf-8'))
+    
+    def show_video(self, socket) : #호스트의 캔버스에 클라이언트의 영상을 보여준다.
+        pass
+    
+      
 if __name__ =='__main__':
     app = QApplication(sys.argv)
     host_window = Host_window()
