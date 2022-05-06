@@ -1,36 +1,20 @@
+from graph import *
+import db_auth as dbs
 import time
-import firebase_admin
-from firebase_admin import credentials, db
-#----------------------------------------
 import sys
-from PyQt5.QtWidgets import *
 from PyQt5 import uic
-# import PyQt5.QtWidgets as qtwid
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-#----------------------------------------
-# import test23.client as client
 import socket
-
-from scipy import rand
-from graph import *
 import random
+# from scipy import rand
 
-# form_class = uic.loadUiType('./ui/test1.ui')[0]
-# form_class = uic.loadUiType('./ui/test_graph.ui')[0]
 form_class = uic.loadUiType('./ui/Widget_test.ui')[0]
 
-key_path = "test-db-b261c-firebase-adminsdk-ddkpv-ff4ed08001.json"
-db_url = "https://test-db-b261c-default-rtdb.firebaseio.com/"
-cred = credentials.Certificate(key_path)
-firebase_admin.initialize_app(cred, {'databaseURL' : db_url})
-dir = db.reference()
 client_info=[]
-# exlist=[80,90,100,70,60,50,40,60,65,55,75,84,55,43,78]
 exlist=[]
 hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
-
 
 class Clientclass(QThread):
     timeout = pyqtSignal(list)    # 사용자 정의 시그널
@@ -41,8 +25,7 @@ class Clientclass(QThread):
         
     def run(self):      
         while True:
-            self.ref = db.reference()
-            self.db_dict = self.ref.get()
+            self.db_dict = dbs.dir.get()
             self.client_info=[]
             for i, each in enumerate(self.db_dict):
                 self.client_info.append(each)
@@ -62,37 +45,23 @@ class Host_window(QWidget, form_class):
         self.setupUI()
         self.IP_label.setText(local_ip)
         self.show()
-    
-        #print(local_ip)
         
     def setupUI(self):
         self.client_table.doubleClicked.connect(self.tableWidget_doubleClicked)
-        #표 수정 불가능하도록 만듦
         self.client_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        # self.ipconnect_btn.clicked.connect(self.chatConnect)
-        
-        
-    
-    # #ip 값 넣고 chat 연결
-    # def chatConnect(self):           
-    #             ip=self.ip_TextEdit.toPlainText()
-    #             print(ip)
-    #             #self.ipconnect_btn.connect(self.client.ChatClient(ip, port))
     
     def tableWidget_doubleClicked(self):
         row = self.client_table.currentIndex().row()
         column = self.client_table.currentIndex().column()
-        # self.Graph_layout.removeItem()
-
         
         myGUI = CustomMainWindow()
-        #어떻게 widget을 없애지?
-    
+
+        for i in reversed(range(self.Graph_layout.count())):
+            self.Graph_layout.removeItem(self.Graph_layout.itemAt(i))
 
         self.Graph_layout.addWidget(myGUI.myFig)
         print(row, column)
-    
-    
+
     @pyqtSlot(list)
     def timeout(self, client_info):
         
@@ -131,4 +100,3 @@ if __name__ =='__main__':
     host_window = Host_window()
     host_window.show()
     app.exec_()
-    

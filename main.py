@@ -1,11 +1,5 @@
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5 import uic
-# import PyQt5.QtWidgets as qtwid
-from PyQt5.QtCore import *
 from host import *
 from client import *
-
 
 mainform_class = uic.loadUiType('./ui/main.ui')[0]
 
@@ -19,8 +13,6 @@ class MyWindow(QMainWindow, mainform_class):
     def button_host(self):
         self.hide()
         self.host_window=Host_window()
-        # self.host_window.exec()
-        # self.show()
 
     def button_client(self):
         self.hide()
@@ -28,7 +20,6 @@ class MyWindow(QMainWindow, mainform_class):
         text, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Server IP:')
 
         if ok:
-            # self.le.setText(str(text))
             self.client_info_window=Client_info_window()
         else:
             self.show()
@@ -38,4 +29,3 @@ if __name__ =='__main__':
     mywindow = MyWindow()
     mywindow.show()
     app.exec_()
-
