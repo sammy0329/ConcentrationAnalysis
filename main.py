@@ -24,17 +24,17 @@ class MyWindow(QMainWindow, mainform_class):
         self.hide()
         
         #classname과 server ip 주소를 암호화
-        classname, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Class Nmae:')
+        self.classname, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Class Nmae:')
        
         if ok:
             self.host_window=Host_window()
             
-            class_serverip=classname+'@'+ self.host_window.local_ip
+            self.class_serverip=classname+'@'+ self.host_window.local_ip
             
-            encrypt_text=cipher_suite.encrypt(class_serverip.encode())
+            self.encrypt_text=cipher_suite.encrypt(self.class_serverip.encode())
             # plain_text = cipher_suite.decrypt(encrypt_text)
-            self.host_window.code_text.setText(encrypt_text.decode('utf-8'))
-            print(encrypt_text.decode('utf-8'))
+            self.host_window.code_text.setText(self.encrypt_text.decode('utf-8'))
+            print(self.encrypt_text.decode('utf-8'))
             # print(plain_text)
         else:
             self.show()
@@ -43,14 +43,14 @@ class MyWindow(QMainWindow, mainform_class):
     def button_client(self):
         self.hide()
         
-        encrypt_text, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Server IP:')
+        self.encrypt_text, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Server IP:')
 
         
         if ok:
-            decrypt_text = cipher_suite.decrypt(encrypt_text.encode('utf-8'))
-            str_data = decrypt_text.decode('utf-8')
-            dir_name,server_ip=str_data.split('@')
-            print(dir_name,server_ip)
+            self.decrypt_text = cipher_suite.decrypt(self.encrypt_text.encode('utf-8'))
+            self.str_data = self.decrypt_text.decode('utf-8')
+            self.dir_name,self.server_ip=self.str_data.split('@')
+            print(self.dir_name,self.server_ip)
             
             self.client_info_window=Client_info_window()
         else:
