@@ -37,13 +37,13 @@ class Clientclass(QThread):
 class Host_window(QWidget, form_class):
     def __init__(self):
         super().__init__()
-       
+        self.local_ip=socket.gethostbyname(hostname)
         self.setupUi(self)
         self.cli=Clientclass()
         self.cli.start()
         self.cli.timeout.connect(self.timeout)   # 시그널 슬롯 등록
         self.setupUI()
-        self.IP_label.setText(local_ip)
+        
         self.show()
         
     def setupUI(self):

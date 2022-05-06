@@ -83,19 +83,19 @@
     </rect>
    </property>
    <property name="title">
-    <string>IP</string>
+    <string>Link</string>
    </property>
-   <widget class="QLabel" name="IP_label">
+   <widget class="QTextEdit" name="code_text">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>391</width>
+      <width>401</width>
       <height>31</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
