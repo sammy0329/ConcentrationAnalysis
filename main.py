@@ -45,7 +45,7 @@ class MyWindow(QMainWindow, mainform_class):
         
         self.encrypt_text, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Server IP:')
 
-        
+
         if ok:
             self.decrypt_text = cipher_suite.decrypt(self.encrypt_text.encode('utf-8'))
             self.str_data = self.decrypt_text.decode('utf-8')
