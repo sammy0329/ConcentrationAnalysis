@@ -98,7 +98,6 @@ class Client_window(QWidget,client_form_class):
         # if timer is stopped
         if not self.timer.isActive():
             self.anl.start()
-            print("13")
             # start timer/
             self.timer.start(20)
             # update control_bt text
@@ -124,7 +123,11 @@ class Client_info_window(QWidget, client_info_form_class):
         self.StudentNumber = self.StudentNumber_text.text() # line_edit text 값 가져오기 
         self.StudentName = self.Name_text.text()
         self.student_id = self.StudentName
-        dbs.dir = db.reference(self.student_id)
+        self.class_name = "컴퓨터 네트워크"
+        self.time_now = time.localtime(time.time())
+        self.time_now = time.strftime("%D일%H시", self.time_now)
+        self.directory = self.student_id + "/" + self.class_name
+        dbs.dir = db.reference(self.directory)
         
         self.hide()
         self.client_window=Client_window()
