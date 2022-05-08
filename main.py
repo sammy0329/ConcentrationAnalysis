@@ -3,7 +3,7 @@ from client import *
 from cryptography.fernet import Fernet
 import json
 
-key_path = "resource/db_auth_key.json"
+key_path = "resource/encoding_key.json"
 
 mainform_class = uic.loadUiType('./ui/main.ui')[0]
 
@@ -29,7 +29,7 @@ class MyWindow(QMainWindow, mainform_class):
         if ok:
             self.host_window=Host_window()
             
-            self.class_serverip=classname+'@'+ self.host_window.local_ip
+            self.class_serverip=self.classname+'@'+ self.host_window.local_ip
             
             self.encrypt_text=cipher_suite.encrypt(self.class_serverip.encode())
             # plain_text = cipher_suite.decrypt(encrypt_text)
@@ -45,7 +45,7 @@ class MyWindow(QMainWindow, mainform_class):
         
         self.encrypt_text, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Server IP:')
 
-        
+
         if ok:
             self.decrypt_text = cipher_suite.decrypt(self.encrypt_text.encode('utf-8'))
             self.str_data = self.decrypt_text.decode('utf-8')
