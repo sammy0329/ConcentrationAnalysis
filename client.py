@@ -15,7 +15,8 @@ from firebase_admin import db
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
 
-prdeict_class = ["놀람", "슬픔", "무표정", "행복", "공포", "역겨움", "분노"]
+prdeict_list = ["놀람", "슬픔", "무표정", "행복", "공포", "역겨움", "분노"]
+weight_list = [0.1, 0.1, 1, 0.2, 0.1, 0.1, 0.1]
 
 model_path = "C:/test_model.h5"
 seg_model = tf.keras.models.load_model(model_path)
@@ -44,14 +45,22 @@ class Analysis_upload(QThread):
 
             if self.frame_counter % self.fps == 0:
                 result_vector = classifier(frame)
-                result = prdeict_class[np.argmax(result_vector)]
+                # result = prdeict_class[np.argmax(result_vector)]
+                result_list = result_vector.reshape(-1)
+                concent_rate = 0
+
+                for i, each in enumerate(result_list):
+                    concent_rate += each * weight_list[i]
+                    print(i, each, weight_list[i], each * weight_list[i], sep="\t")
+                print("sum = ", concent_rate * 100)
+                print("*" * 20)
 
                 time_now = time.localtime(time.time())
                 time_now = time.strftime("%H:%M:%S", time_now)
 
-                query = "{{'{}':'{}'}}".format(time_now, result)
+                query = "{{'{}':'{}'}}".format(time_now, concent_rate)
                 query = eval(query)
-                dbs.dir.update(query)
+                # dbs.dir.update(query)
                 print(query)
 
 class Client_window(QWidget,client_form_class):
