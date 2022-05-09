@@ -24,7 +24,7 @@ class MyWindow(QMainWindow, mainform_class):
         self.hide()
         
         #classname과 server ip 주소를 암호화
-        self.classname, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Class Nmae:')
+        self.classname, ok = QInputDialog.getText(self, 'Input Class Name', 'Enter your Class Nmae:')
        
         if ok:
             self.host_window=Host_window()
@@ -43,7 +43,7 @@ class MyWindow(QMainWindow, mainform_class):
     def button_client(self):
         self.hide()
         
-        self.encrypt_text, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your Server IP:')
+        self.encrypt_text, ok = QInputDialog.getText(self, 'Input Link', 'Enter your Link:')
 
 
         if ok:

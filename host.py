@@ -52,7 +52,10 @@ class Host_window(QWidget, form_class):
     
     def tableWidget_doubleClicked(self):
         row = self.client_table.currentIndex().row()
-        column = self.client_table.currentIndex().column()
+    
+        #더블클릭시 클라이언트 이름 따오기
+        client_name = self.client_table.item(row, 0).text()
+        print(client_name)
         
         myGUI = CustomMainWindow()
 
@@ -60,7 +63,7 @@ class Host_window(QWidget, form_class):
             self.Graph_layout.removeItem(self.Graph_layout.itemAt(i))
 
         self.Graph_layout.addWidget(myGUI.myFig)
-        print(row, column)
+        
 
     @pyqtSlot(list)
     def timeout(self, client_info):
