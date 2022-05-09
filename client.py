@@ -11,6 +11,10 @@ import tensorflow as tf
 import numpy as np
 import db_auth as dbs
 from firebase_admin import db
+import base64
+import cv2
+from socket import *
+from threading import *
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
@@ -65,19 +69,51 @@ class Analysis_upload(QThread):
 
 class Client_window(QWidget,client_form_class):
     # class constructor
-    def __init__(self):
+    def __init__(self, ip, port):
         # call QWidget constructor
         super().__init__()
        
         self.setupUi(self)
         self.cap = cv2.VideoCapture(0)
         self.anl = Analysis_upload(self.cap)
+        self.initialize_socket(ip, port) #소켓 초기화
         # create a timer
         self.timer = QTimer()
         # set timer timeout callback function
         self.timer.timeout.connect(self.viewCam)
         # set control_bt callback clicked  function
         self.control_bt.clicked.connect(self.controlTimer)
+
+    def initialize_socket(self, ip, port) :
+        self.client_socket = socket(AF_INET, SOCK_STREAM) #소켓 생성
+        remote_ip = ip 
+        remote_port = port
+        self.client_socket.connect((remote_ip, remote_port))
+
+    def receive_signal(self, socket) : #시그널을 받았을 때 send_video 호출하는 함수
+        while True :
+            buf = socket.recv(256)
+            print(buf.decode('utf-8'))
+            self.send_video(socket)
+
+    def send_video(self, socket) : #서버(호스트)로부터 요청을 받았을 때 영상을 전송해주는 함수
+        try :
+            while self.cap.isOpened() :
+                ret, frame = self.cap.read()
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+                result, imgencode = cv2.imgencode('.jpg', frame, encode_param)
+                data = np.array(imgencode)
+                stringData = base64.b64encode(data)
+                length = str(len(stringData))
+                self.client_socket.sendall(length.encode('utf-8').ljust(64))
+                self.client_socket.send(stringData)
+        
+        except :
+            self.client_socket.close()
+
+    def send_video_thread(self) : #클라이언트 소켓 생성시 발생하는 스레드
+        send_video_th = Thread(target = self.receive_signal, args = (self.client_socket, ))
+        send_video_th.start()
 
     # view camera
     def viewCam(self):
