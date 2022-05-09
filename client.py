@@ -37,6 +37,11 @@ class Client_window(QWidget,client_form_class):
         remote_port = port
         self.client_socket.connect((remote_ip, remote_port))
         
+    def receive_signal(self, socket) : #시그널을 받았을 때 send_video 호출하는 함수
+        while True :
+            buf = socket.recv(256)
+            self.send_video(socket)
+                
     def send_video(self, socket) : #서버(호스트)로부터 요청을 받았을 때 영상을 전송해주는 함수
         try :
             while self.cap.isOpened() :
@@ -52,9 +57,8 @@ class Client_window(QWidget,client_form_class):
         except :
             self.client_socket.close()
     
-    def send_video_thread(self) : #클라이언트 접속 후 start 버튼을 클릭했을 때 thread를 생성한다.
-        # 그 후 send_video 함수를 통해 호스트(서버)로 영상을 전송될 수 있게 한다.
-        send_video_th = Thread(target = self.send_video, args = (self.client_socket, ))
+    def send_video_thread(self) : #클라이언트 소켓 생성시 발생하는 스레드
+        send_video_th = Thread(target = self.receive_signal, args = (self.client_socket, ))
         send_video_th.start()
     
     # view camera
