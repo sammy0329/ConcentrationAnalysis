@@ -16,7 +16,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import time
 import threading
 from PyQt5 import uic
-
+import random
 
 # form_class = uic.loadUiType('./ui/Widget_test.ui')[0]
 form_class1 = uic.loadUiType('./ui/graph.ui')[0]
@@ -62,6 +62,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         # b.append(3.0)
         # b.append(4.0)
         self.y = (self.n * 0.0) + 50
+
         # The window
         self.fig = Figure(figsize=(5,5), dpi=100)
         self.fig.subplots_adjust(0.1, 0.25, 0.98, 0.9)# left,bottom,right,top 
@@ -142,13 +143,17 @@ def dataSendLoop(addData_callbackFunc):
 
     # Simulate some data
     n = np.linspace(0, 499, 500)
-    y = 50 + 25*(np.sin(n / 8.3)) + 10*(np.sin(n / 7.5)) - 5*(np.sin(n / 1.5))
+    # y = 50 + 25*(np.sin(n / 8.3)) + 10*(np.sin(n / 7.5)) - 5*(np.sin(n / 1.5))
+    y=[]
+    for i in range(100):
+        y.append(random.randint(0,100))
     i = 0
 
     while(True):
         if(i > 499):
             i = 0
-        time.sleep(0.1)
+        # time.sleep(0.1)
+        time.sleep(1)
         mySrc.data_signal.emit(y[i]) # <- Here you emit a signal!
         i += 1
     ###

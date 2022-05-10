@@ -113,11 +113,15 @@ class Client_window(QWidget,client_form_class):
             self.control_bt.setText("Start")
         
 class Client_info_window(QWidget, client_info_form_class):
-    def __init__(self):
+    def __init__(self,dir_name,server_ip):
         super().__init__()
+        self.dir_name=dir_name
+        self.server_ip=server_ip
+        print(self.dir_name,self.server_ip)
         self.setupUi(self)
         self.commit_btn.clicked.connect(self.button_commit)
         self.show()
+
         
     def button_commit(self):
         self.StudentNumber = self.StudentNumber_text.text() # line_edit text 값 가져오기 

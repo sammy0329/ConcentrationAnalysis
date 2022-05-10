@@ -50,9 +50,9 @@ class MyWindow(QMainWindow, mainform_class):
             self.decrypt_text = cipher_suite.decrypt(self.encrypt_text.encode('utf-8'))
             self.str_data = self.decrypt_text.decode('utf-8')
             self.dir_name,self.server_ip=self.str_data.split('@')
-            print(self.dir_name,self.server_ip)
+            # print(self.dir_name,self.server_ip)
             
-            self.client_info_window=Client_info_window()
+            self.client_info_window=Client_info_window(self.dir_name,self.server_ip)
         else:
             self.show()
 

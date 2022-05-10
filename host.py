@@ -31,7 +31,7 @@ class Clientclass(QThread):
                 self.client_info.append(each)
             self.timeout.emit(self.client_info)
             
-            time.sleep(3)
+            time.sleep(1)
       
 # class Host_window(QMainWindow, form_class):  
 class Host_window(QWidget, form_class):
