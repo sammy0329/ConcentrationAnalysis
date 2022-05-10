@@ -11,10 +11,6 @@ import tensorflow as tf
 import numpy as np
 import db_auth as dbs
 from firebase_admin import db
-import base64
-import cv2
-from socket import *
-import threading
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
@@ -83,42 +79,6 @@ class Client_window(QWidget,client_form_class):
         # set control_bt callback clicked  function
         self.control_bt.clicked.connect(self.controlTimer)
 
-    def initialize_socket(self, ip) :
-        self.client_socket = socket(AF_INET, SOCK_STREAM) #소켓 생성
-        remote_ip = ip 
-        remote_port = 2500
-        self.client_socket.connect((remote_ip, remote_port))
-        #효준아 이 밑의 self.send_to_db 함수만 만들어줘.  
-        self.send_to_db(remote_ip, remote_port)
-
-    def send_to_db(self, ip, port) :
-        pass
-
-    def receive_signal(self, socket) : #시그널을 받았을 때 send_video 호출하는 함수
-        while True :
-            buf = socket.recv(256)
-            print(buf.decode('utf-8'))
-            self.send_video(socket)
-
-    def send_video(self, socket) : #서버(호스트)로부터 요청을 받았을 때 영상을 전송해주는 함수
-        try :
-            while self.cap.isOpened() :
-                ret, frame = self.cap.read()
-                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-                result, imgencode = cv2.imgencode('.jpg', frame, encode_param)
-                data = np.array(imgencode)
-                stringData = base64.b64encode(data)
-                length = str(len(stringData))
-                socket.sendall(length.encode('utf-8').ljust(64))
-                socket.send(stringData)
-        
-        except :
-            socket.close()
-
-    def send_video_thread(self) : #클라이언트 소켓 생성시 발생하는 스레드
-        send_video_th = threading.Thread(target = self.receive_signal, args = (self.client_socket, ))
-        send_video_th.start()
-
     # view camera
     def viewCam(self):
         # read image in BGR format
@@ -153,16 +113,17 @@ class Client_window(QWidget,client_form_class):
             self.control_bt.setText("Start")
         
 class Client_info_window(QWidget, client_info_form_class):
-    def __init__(self, dir_name, server_ip):
+    def __init__(self,dir_name,server_ip):
         super().__init__()
-        self.client_win = Client_window()
-        self.dir_name = dir_name
-        self.server_ip = server_ip
+        self.dir_name=dir_name
+        self.server_ip=server_ip
+        print(self.dir_name,self.server_ip)
         self.setupUi(self)
         self.commit_btn.clicked.connect(self.button_commit)
         self.show()
+
         
-    def button_commit(self): 
+    def button_commit(self):
         self.StudentNumber = self.StudentNumber_text.text() # line_edit text 값 가져오기 
         self.StudentName = self.Name_text.text()
         self.student_id = self.StudentName
@@ -170,7 +131,6 @@ class Client_info_window(QWidget, client_info_form_class):
         self.time_now = time.localtime(time.time())
         self.time_now = time.strftime("%D일%H시", self.time_now)
         self.directory = self.student_id + "/" + self.class_name
-        self.client_win.initialize_socket(self.server_ip)
         dbs.dir = db.reference(self.directory)
         
         self.hide()

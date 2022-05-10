@@ -12,7 +12,7 @@ with open (key_path, "r") as f:
     
 key=data['class_key'].encode('utf-8')
 cipher_suite = Fernet(key)
-        
+      
 class MyWindow(QMainWindow, mainform_class):
     def __init__(self):
         super().__init__()

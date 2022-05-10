@@ -9,7 +9,7 @@ import random
 import cv2
 
 clients=[]
-
+users={}
 class MainServer(QThread) :
     
     def __init__(self) :
