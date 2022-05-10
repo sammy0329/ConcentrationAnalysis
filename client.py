@@ -60,7 +60,7 @@ class Analysis_upload(QThread):
 
                 query = "{{'{}':'{}'}}".format(time_now, concent_rate)
                 query = eval(query)
-                # dbs.dir.update(query)
+                dbs.dir.update(query)
                 print(query)
 
 class Client_window(QWidget,client_form_class):
@@ -126,11 +126,30 @@ class Client_info_window(QWidget, client_info_form_class):
     def button_commit(self):
         self.StudentNumber = self.StudentNumber_text.text() # line_edit text 값 가져오기 
         self.StudentName = self.Name_text.text()
-        self.student_id = self.StudentName
-        self.class_name = "컴퓨터 네트워크"
-        self.time_now = time.localtime(time.time())
-        self.time_now = time.strftime("%D일%H시", self.time_now)
-        self.directory = self.student_id + "/" + self.class_name
+        self.SutdentIP = '000.000.000.000' # IP 변수로 수정해야함
+        self.StudentPort = 5717 # 포트 변수로 수정해야함
+        
+        self.directory = self.dir_name  + "/" + self.StudentName + "/학생정보"
+        dbs.dir = db.reference(self.directory)
+
+        self.query = "{{'{}':'{}'}}".format("학번", self.StudentNumber)
+        self.query = eval(self.query)
+        dbs.dir.update(self.query)
+        
+        self.query = "{{'{}':'{}'}}".format("이름", self.StudentName)
+        self.query = eval(self.query)
+        dbs.dir.update(self.query)
+        
+        self.query = "{{'{}':'{}'}}".format("IP", self.SutdentIP)
+        self.query = eval(self.query)
+        dbs.dir.update(self.query)
+
+        self.query = "{{'{}':'{}'}}".format("Port", self.StudentPort)
+        self.query = eval(self.query)
+        dbs.dir.update(self.query)
+
+
+        self.directory = self.dir_name  + "/" + self.StudentName + "/분석로그"
         dbs.dir = db.reference(self.directory)
         
         self.hide()
