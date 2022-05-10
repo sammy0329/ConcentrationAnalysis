@@ -8,8 +8,7 @@ from PyQt5.QtCore import *
 import socket
 import random
 # from scipy import rand
-from socket import *
-from threading import *
+import threading
 import base64
 import numpy
 import cv2
@@ -19,10 +18,9 @@ form_class = uic.loadUiType('./ui/Widget_test.ui')[0]
 
 client_info=[]
 exlist=[]
-hostname = gethostname()
-local_ip = gethostbyname(hostname)
+hostname = socket.gethostname()
+local_ip = socket.gethostbyname(hostname)
 clients = [] #클라이언트 리스트
-sockets = [] #소켓 리스트
 
 class Clientclass(QThread):
     timeout = pyqtSignal(list)    # 사용자 정의 시그널
@@ -109,12 +107,10 @@ class Host_window(QWidget, form_class):
 class MainServer(QThread) :
     
     def __init__(self) :
-        self.hostClass = Host_window()
-        self.hostClass.start()
-        self.s_sock = socket(AF_INET, SOCK_STREAM)
+        self.s_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ip = ""
         self.port = 2500 #우선 포트 번호 2500으로 고정. 나중에 수정 가능
-        self.s_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) #다중 접속 방지
+        self.s_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #다중 접속 방지
         self.s_sock.bind((self.ip, self.port)) #ip와 port를 바인드
         print("클라이언트 대기 중...")
         self.s_sock.listen(100) #접속자 100명까지
@@ -141,7 +137,7 @@ class MainServer(QThread) :
         self.show_thread(socket)
 
     def show_thread(self, socket) : #시그널을 보낸 후 show_thread 실행
-        show_th = Thread(target = self.show_video, args = (socket, ))
+        show_th = threading.Thread(target = self.show_video, args = (socket, ))
         show_th.start()
     
     def show_video(self, socket) : #호스트의 캔버스에 클라이언트의 영상을 보여준다.
@@ -164,6 +160,7 @@ class MainServer(QThread) :
             buf += newbuf
             count -= len(newbuf)
         return buf
+
 
 if __name__ =='__main__':
     app = QApplication(sys.argv)
