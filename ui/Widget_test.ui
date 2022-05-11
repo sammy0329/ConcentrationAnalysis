@@ -50,29 +50,6 @@
     <string>Client Info</string>
    </property>
   </widget>
-  <widget class="QScrollArea" name="Input_cam">
-   <property name="geometry">
-    <rect>
-     <x>58</x>
-     <y>128</y>
-     <width>421</width>
-     <height>411</height>
-    </rect>
-   </property>
-   <property name="widgetResizable">
-    <bool>true</bool>
-   </property>
-   <widget class="QWidget" name="scrollAreaWidgetContents">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>419</width>
-      <height>409</height>
-     </rect>
-    </property>
-   </widget>
-  </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
@@ -128,6 +105,19 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string>Cam</string>
    </property>
+   <widget class="QLabel" name="image_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>411</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="Message_box">
    <property name="geometry">
@@ -159,6 +149,11 @@ p, li { white-space: pre-wrap; }
    </property>
    <column>
     <property name="text">
+     <string>학번</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
      <string>이름</string>
     </property>
    </column>
@@ -169,17 +164,12 @@ p, li { white-space: pre-wrap; }
    </column>
    <column>
     <property name="text">
-     <string>기타</string>
+     <string>ip</string>
     </property>
    </column>
    <column>
     <property name="text">
-     <string>기타2</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>기타3</string>
+     <string>port</string>
     </property>
    </column>
   </widget>
