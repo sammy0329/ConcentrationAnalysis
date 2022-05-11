@@ -164,6 +164,11 @@ p, li { white-space: pre-wrap; }
    </column>
    <column>
     <property name="text">
+     <string>특이사항</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
      <string>ip</string>
     </property>
    </column>
