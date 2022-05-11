@@ -95,11 +95,11 @@ class Host_window(QWidget, form_class):
         row = self.client_table.currentIndex().row()
     
         #더블클릭시 클라이언트 이름 따오기
-        client_name = self.client_table.item(row, 1).text()
+        client_IP = self.client_table.item(row, 4).text()
         # print(clients[0])
-        self.serverwindow.send_signal(clients[0])
+        # self.serverwindow.send_signal(clients[0])
         self.myGUI = CustomMainWindow()
-
+        print(client_IP)
         for i in reversed(range(self.Graph_layout.count())):
             self.Graph_layout.removeItem(self.Graph_layout.itemAt(i))
 
@@ -146,12 +146,14 @@ class Host_window(QWidget, form_class):
             self.client_table.setItem(i,0,QTableWidgetItem(users[each]['학번']))
             self.client_table.setItem(i,1,QTableWidgetItem(users[each]['이름']))
             self.client_table.setItem(i,2, item_refresh)
+            self.client_table.setItem(i,4,QTableWidgetItem(users[each]['IP']))
             
         
         self.client_table.setSortingEnabled(True)
 
 class MainServer(QThread) :
     changePixmap = pyqtSignal(QImage)
+    
     def __init__(self) :
         super().__init__()
         self.s_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -169,6 +171,7 @@ class MainServer(QThread) :
 
 
     def viewCam(self):
+      
         self.student_client = self.c_socket, (self.ip, self.port) = self.s_sock.accept()
 
         self.conn=self.c_socket
@@ -179,7 +182,7 @@ class MainServer(QThread) :
             print(self.ip + " : " + str(self.port) + "가 연결되었습니다.")
             
         while True:
-            print('계속도는중')
+            # print('계속도는중')
           
             print(self.ip + " : " + str(self.port) + "가 연결되었습니다.")
             # self.student_client = self.c_socket, (self.ip, self.port) = self.s_sock.accept()
