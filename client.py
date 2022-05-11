@@ -15,7 +15,7 @@ from socket import *
 import pickle
 import struct
 from sub_model import sub_model
-
+import threading
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
 
@@ -31,6 +31,8 @@ seg_model = models.__dict__["resmasking_dropout1"]
 seg_model.load_state_dict(torch.load(model_path))
 print(seg_model.summary())
 '''
+hostname = gethostname()
+local_ip = gethostbyname(hostname)
 
 def classifier(frame_input):
     frame_input = cv2.resize(frame_input, (256, 256), interpolation=cv2.INTER_LINEAR)
@@ -89,9 +91,7 @@ class Client_window(QWidget,client_form_class):
         self.timer = QTimer()
         # set timer timeout callback function
         self.timer.timeout.connect(self.viewCam)
-     
-        # set control_bt callback clicked  function
-        self.control_bt.clicked.connect(self.controlTimer)
+        self.controlTimer()
 
 
     # view camera
@@ -108,7 +108,6 @@ class Client_window(QWidget,client_form_class):
         # show image in img_label
         self.image_label.setPixmap(QPixmap.fromImage(qImg))
 
-    # start/stop timer
     def controlTimer(self):
         # if timer is stopped
         if not self.timer.isActive():
@@ -117,19 +116,10 @@ class Client_window(QWidget,client_form_class):
             self.send.start()
             # start timer/
             self.timer.start(20)
-            # update control_bt text
-            self.control_bt.setText("Stop")
-
-        # if timer is started
-        else:
-            # stop timer
-            self.timer.stop()
-            # release video capture
-            self.cap.release()
-            # update control_bt text
-            self.control_bt.setText("Start")
+    
 
 class SendVideo(QThread):
+
     def __init__(self, cv_cap, server_ip):
         super().__init__()
         self.cap = cv_cap
@@ -231,7 +221,7 @@ class SendVideo(QThread):
 class Client_info_window(QWidget, client_info_form_class):
     def __init__(self, dir_name, server_ip):
         super().__init__()
-      
+        self.client_ip=local_ip
         self.dir_name = dir_name
         self.server_ip = server_ip
         # self.client_win = Client_window()
@@ -242,7 +232,7 @@ class Client_info_window(QWidget, client_info_form_class):
     def button_commit(self): 
         self.StudentNumber = self.StudentNumber_text.text() # line_edit text 값 가져오기 
         self.StudentName = self.Name_text.text()
-        self.SutdentIP = '000.000.000.000' # IP 변수로 수정해야함
+        self.SutdentIP = self.client_ip # IP 변수로 수정해야함
         self.StudentPort = 5717 # 포트 변수로 수정해야함
         
         self.directory = self.dir_name  + "/" + self.StudentName + "/학생정보"
