@@ -42,7 +42,7 @@ class sub_model(QThread):
         query = "{{'{}':'{}'}}".format("status", "")
         query = eval(query)
         dbs.dir.update(query)
-        print("leave")
+        print("normal")
 
     def run(self):
         while True:

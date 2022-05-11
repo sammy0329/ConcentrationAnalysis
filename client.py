@@ -161,7 +161,7 @@ class SendVideo(QThread):
 
             # Then data
             self.soc.sendall(self.message_size + self.data)
-            print("일하는중")
+            # print("일하는중")
         
        
 
