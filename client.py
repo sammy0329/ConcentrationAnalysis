@@ -61,9 +61,6 @@ class Analysis_upload(QThread):
 
                 for i, each in enumerate(result_list):
                     concent_rate += each * weight_list[i]
-                    # print(i, each, weight_list[i], each * weight_list[i], sep="\t")
-                # print("sum = ", concent_rate * 100)
-                # print("*" * 20)
 
                 time_now = time.localtime(time.time())
                 time_now = time.strftime("%H:%M:%S", time_now)
