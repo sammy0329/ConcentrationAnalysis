@@ -17,6 +17,8 @@ from socket import *
 import threading
 import pickle
 import struct
+from submodel.sub_model import sub_model
+
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
@@ -77,7 +79,9 @@ class Client_window(QWidget,client_form_class):
         self.server_ip=server_ip
         self.setupUi(self)
         self.cap = cv2.VideoCapture(0)
+        
         self.anl = Analysis_upload(self.cap)
+        self.submodel=sub_model(self.cap)
         self.send=SendVideo(self.cap,self.server_ip)
         # create a timer
         self.timer = QTimer()
@@ -106,6 +110,7 @@ class Client_window(QWidget,client_form_class):
     def controlTimer(self):
         # if timer is stopped
         if not self.timer.isActive():
+            self.submodel.start()
             self.anl.start()
             self.send.start()
             # start timer/
