@@ -36,39 +36,44 @@ class Clientclass(QThread):
         self.users={}
 
     def run(self):      
-        while True:
-            dbs.dir = db.reference(self.classname)
-            self.db_dict = dbs.dir.get()
-            self.client_info=[]
-            self.log_list = []
-            self.que_size = 30
-
-            for name in self.db_dict:
-                self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
-                self.student_info_dic = self.info_dir.get()
-                self.users[name]=self.student_info_dic
-                print("!")
-                self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
-                self.student_log = self.log_dir.get()
-                print(name, len(self.student_log))
-
-                if len(self.student_log)>=self.que_size:
-                    for i, each in enumerate(self.student_log):
-                        if len(self.student_log)-i <=self.que_size:
-                            self.log_list.append(self.student_log[each])
-
-                else:
-                    self.log_list = list(0 for i in range(self.que_size-len(self.student_log)))
-                    for each in self.student_log:
-                        self.log_list.append(self.student_log[each])
+        try:
+            while True:
+                dbs.dir = db.reference(self.classname)
+                self.db_dict = dbs.dir.get()
+                self.client_info=[]
+                self.log_list = []
+                self.que_size = 30
+                self.log_list={}
                 
-                print(self.log_list)
-                self.log_list=[]
-                print("="*20)
+                for name in self.db_dict:
+                    self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
+                    self.student_info_dic = self.info_dir.get()
+                    self.users[name]=self.student_info_dic
+                    print("!")
+                    self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
+                    self.student_log = self.log_dir.get()
+                    print(name, len(self.student_log))
 
-            self.timeout.emit(self.users)
-     
-            time.sleep(3)
+                    if len(self.student_log)>=self.que_size:
+                        for i, each in enumerate(self.student_log):
+                            if len(self.student_log)-i <=self.que_size:
+                                self.log_list.append(self.student_log[each])
+
+                    else:
+                        self.log_list = list(0 for i in range(self.que_size-len(self.student_log)))
+                        for each in self.student_log:
+                            self.log_list.append(self.student_log[each])
+                    
+                    print(self.log_list)
+                    self.log_list=[]
+                    print("="*20)
+
+                self.timeout.emit(self.users)
+        
+                time.sleep(3)
+        except:
+            pass
+            
             
   
 class Host_window(QWidget, form_class):
