@@ -142,7 +142,8 @@ class MainServer(QThread) :
     def __init__(self) :
         super().__init__()
         self.s_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.ip = ""
+        # self.ip = ""
+        self.ip=local_ip
         self.port = 2500 #우선 포트 번호 2500으로 고정. 나중에 수정 가능
         self.s_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #다중 접속 방지
         self.s_sock.bind((self.ip, self.port)) #ip와 port를 바인드
@@ -169,7 +170,7 @@ class MainServer(QThread) :
         while True:
             # print('계속도는중')
           
-            print(self.ip + " : " + str(self.port) + "가 연결되었습니다.")
+            
             # self.student_client = self.c_socket, (self.ip, self.port) = self.s_sock.accept()
 
             # self.conn=self.c_socket
@@ -197,7 +198,7 @@ class MainServer(QThread) :
             # Extract frame
             self.frame = pickle.loads(self.frame_data)
             
-            print(self.frame)
+          
             # read image in BGR format
             # ret, image = frame.read()
             # convert image to RGB format

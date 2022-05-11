@@ -21,8 +21,7 @@ class MyWindow(QMainWindow, mainform_class):
         self.client_btn.clicked.connect(self.button_client)
     
     def button_host(self):
-        self.hide()
-        
+        self.hide()      
         #classname과 server ip 주소를 암호화
         self.classname, ok = QInputDialog.getText(self, 'Input Class Name', 'Enter your Class Nmae:')
        
