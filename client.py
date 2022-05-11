@@ -24,7 +24,8 @@ client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
 prdeict_list = ["놀람", "슬픔", "무표정", "행복", "공포", "역겨움", "분노"]
 weight_list = [0.1, 0.1, 1, 0.2, 0.1, 0.1, 0.1]
 
-model_path = "C:/test_model.h5"
+# model_path = "C:/test_model.h5"
+model_path = "C:/model.36"
 seg_model = tf.keras.models.load_model(model_path)
 
 def classifier(frame_input):
