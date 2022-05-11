@@ -1,5 +1,7 @@
+from psutil import users
 from graph import *
 import db_auth as dbs
+from firebase_admin import db
 import time
 import sys
 from PyQt5 import uic
@@ -28,27 +30,46 @@ clients = [] #클라이언트 리스트
 class Clientclass(QThread):
     timeout = pyqtSignal(list)    # 사용자 정의 시그널
     
-    def __init__(self):
+    def __init__(self,classname):
         super().__init__()
         self.client_info=[]           # 초깃값 설정
-        
+        self.classname=classname 
+        self.users={}
+
     def run(self):      
         while True:
+            dbs.dir = db.reference(self.classname)
+            
+            # self.directory = self.dir_name  + "/" + self.StudentName + "/학생정보"
             self.db_dict = dbs.dir.get()
             self.client_info=[]
-            for i, each in enumerate(self.db_dict):
-                self.client_info.append(each)
+#IP 학번 이름 Port
+            for i, name in enumerate(self.db_dict):
+
+                self.student_info = db.reference(self.classname+"/"+name+"/"+"학생정보")
+                self.student_info_dic = self.student_info.get()
+                self.users[name]=self.student_info_dic
+            #     # print(self.student_info_dic)
+            #     print(self.student_info_dic['이름'])
+
+            #     for i, each in enumerate(self.student_info_dic['이름']):
+            #         if each not in self.users:
+            #             self.users[each]['ip']=self.student_info_dic['IP'][i]
+            #             self.users[each]['stuent_num']=self.student_info_dic['학번'][i]
+            #             self.users[each]['student_port']=self.student_info_dic['Port'][i]
+            # print(self.users)
             self.timeout.emit(self.client_info)
-            
+            # print(self.users)
             time.sleep(3)
-      
+            print(self.users)
 # class Host_window(QMainWindow, form_class):  
 class Host_window(QWidget, form_class):
-    def __init__(self):
+    def __init__(self,classname):
         super().__init__()
         self.local_ip=socket.gethostbyname(hostname)
         self.setupUi(self)
-        self.cli=Clientclass()
+        self.classname=classname
+        self.cli=Clientclass(self.classname)
         self.cli.start()
         self.cli.timeout.connect(self.timeout)   # 시그널 슬롯 등록
         

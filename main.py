@@ -27,7 +27,7 @@ class MyWindow(QMainWindow, mainform_class):
         self.classname, ok = QInputDialog.getText(self, 'Input Class Name', 'Enter your Class Nmae:')
        
         if ok:
-            self.host_window=Host_window()
+            self.host_window=Host_window(self.classname)
             
             self.class_serverip=self.classname+'@'+ self.host_window.local_ip
             
