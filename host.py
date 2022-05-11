@@ -28,7 +28,7 @@ local_ip = socket.gethostbyname(hostname)
 clients = [] #클라이언트 리스트
 
 class Clientclass(QThread):
-    timeout = pyqtSignal(list)    # 사용자 정의 시그널
+    timeout = pyqtSignal(dict)    # 사용자 정의 시그널
     
     def __init__(self,classname):
         super().__init__()
@@ -39,30 +39,21 @@ class Clientclass(QThread):
     def run(self):      
         while True:
             dbs.dir = db.reference(self.classname)
-            
-            # self.directory = self.dir_name  + "/" + self.StudentName + "/학생정보"
             self.db_dict = dbs.dir.get()
             self.client_info=[]
+
 #IP 학번 이름 Port
             for i, name in enumerate(self.db_dict):
 
                 self.student_info = db.reference(self.classname+"/"+name+"/"+"학생정보")
                 self.student_info_dic = self.student_info.get()
                 self.users[name]=self.student_info_dic
-            #     # print(self.student_info_dic)
-            #     print(self.student_info_dic['이름'])
-
-            #     for i, each in enumerate(self.student_info_dic['이름']):
-            #         if each not in self.users:
-            #             self.users[each]['ip']=self.student_info_dic['IP'][i]
-            #             self.users[each]['stuent_num']=self.student_info_dic['학번'][i]
-            #             self.users[each]['student_port']=self.student_info_dic['Port'][i]
-            # print(self.users)
-            self.timeout.emit(self.client_info)
-            # print(self.users)
+            # print(len(self.users.keys()))
+            self.timeout.emit(self.users)
+     
             time.sleep(3)
-            print(self.users)
-# class Host_window(QMainWindow, form_class):  
+            
+  
 class Host_window(QWidget, form_class):
     def __init__(self,classname):
         super().__init__()
@@ -105,18 +96,19 @@ class Host_window(QWidget, form_class):
         self.image_label.update()
 
 
-    @pyqtSlot(list)
-    def timeout(self, client_info):
+    @pyqtSlot(dict)
+    def timeout(self, users):
         
-        self.client_table.setRowCount(len(client_info))
-        self.client_table.setColumnCount(5)
-        self.client_table.setColumnHidden(3, True)
+        self.client_table.setRowCount(len(users.keys()))
+        self.client_table.setColumnCount(6)
         self.client_table.setColumnHidden(4, True)
+        self.client_table.setColumnHidden(5, True)
         # self.client_table.resizeRowToContents(2)
         # self.client_table.resizeColumnToContents(2)
         #애초에 소팅 설정해두면 에러가 나서 끊어주고 데이터 넣고 다시 True로 바꿔줌.
         self.client_table.setSortingEnabled(False)
-        for i in range(len(client_info)):
+
+        for i,each in enumerate(users.keys()):
             a=random.randint(1,100)
             #집중도 숫자로 표현
             item_refresh = QTableWidgetItem()
@@ -135,8 +127,11 @@ class Host_window(QWidget, form_class):
                 # item_refresh.setFont(QFont("Times", 7, QFont.Bold))
                 item_refresh.setFont(QFont("Arial", 10, QFont.Bold))
 
+            
+            self.client_table.setItem(i,0,QTableWidgetItem(users[each]['학번']))
+            self.client_table.setItem(i,1,QTableWidgetItem(users[each]['이름']))
             self.client_table.setItem(i,2, item_refresh)
-            self.client_table.setItem(i,1,QTableWidgetItem(client_info[i]))
+            
         
         self.client_table.setSortingEnabled(True)
 
@@ -171,9 +166,6 @@ class MainServer(QThread) :
         while True:
             print('계속도는중')
           
-            
-            
-                
             print(self.ip + " : " + str(self.port) + "가 연결되었습니다.")
             # self.student_client = self.c_socket, (self.ip, self.port) = self.s_sock.accept()
 
