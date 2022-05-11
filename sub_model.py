@@ -4,6 +4,7 @@ from cvzone.FaceMeshModule import FaceMeshDetector
 from cvzone.PlotModule import LivePlot
 import schedule
 from PyQt5.QtCore import QThread
+import db_auth as dbs
 
 class sub_model(QThread):
     def __init__(self, cv_cap):
@@ -28,14 +29,21 @@ class sub_model(QThread):
 
 
     def warning(self) :   # 잘 때
-        print("sleep")            
+        query = "{{'{}':'{}'}}".format("status", "sleep")
+        query = eval(query)
+        dbs.dir.update(query)
+        print("sleep")
 
     def leaving(self) : # 얼굴 감지 안될 때
-
-        print("leaving")
+        query = "{{'{}':'{}'}}".format("status", "leave")
+        query = eval(query)
+        dbs.dir.update(query)
+        print("leave")
 
     def yawning(self) : # 하품할 때
-
+        query = "{{'{}':'{}'}}".format("status", "yawning")
+        query = eval(query)
+        dbs.dir.update(query)
         print("yawning")
 
     def run(self):

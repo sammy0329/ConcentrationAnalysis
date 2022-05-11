@@ -1,5 +1,4 @@
 import sys
-import cv2
 import time
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
@@ -11,14 +10,11 @@ import tensorflow as tf
 import numpy as np
 import db_auth as dbs
 from firebase_admin import db
-import base64
 import cv2
 from socket import *
-import threading
 import pickle
 import struct
-from submodel.sub_model import sub_model
-
+from sub_model import sub_model
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
@@ -26,9 +22,15 @@ client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
 prdeict_list = ["놀람", "슬픔", "무표정", "행복", "공포", "역겨움", "분노"]
 weight_list = [0.1, 0.1, 1, 0.2, 0.1, 0.1, 0.1]
 
-# model_path = "C:/test_model.h5"
-model_path = "C:/model.36"
+model_path = "C:/test_model.h5"
 seg_model = tf.keras.models.load_model(model_path)
+
+'''
+model_path = "C:/model.pt"
+seg_model = models.__dict__["resmasking_dropout1"]
+seg_model.load_state_dict(torch.load(model_path))
+print(seg_model.summary())
+'''
 
 def classifier(frame_input):
     frame_input = cv2.resize(frame_input, (256, 256), interpolation=cv2.INTER_LINEAR)
@@ -54,7 +56,6 @@ class Analysis_upload(QThread):
 
             if self.frame_counter % self.fps == 0:
                 result_vector = classifier(frame)
-                # result = prdeict_class[np.argmax(result_vector)]
                 result_list = result_vector.reshape(-1)
                 concent_rate = 0
 
@@ -82,7 +83,7 @@ class Client_window(QWidget,client_form_class):
         self.cap = cv2.VideoCapture(0)
         
         self.anl = Analysis_upload(self.cap)
-        self.submodel=sub_model(self.cap)
+        self.submodel=sub_model(self.cap, )
         self.send=SendVideo(self.cap,self.server_ip)
         # create a timer
         self.timer = QTimer()
@@ -111,8 +112,8 @@ class Client_window(QWidget,client_form_class):
     def controlTimer(self):
         # if timer is stopped
         if not self.timer.isActive():
-            self.submodel.start()
             self.anl.start()
+            self.submodel.start()
             self.send.start()
             # start timer/
             self.timer.start(20)
