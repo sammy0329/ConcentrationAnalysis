@@ -20,13 +20,11 @@ class sub_model(QThread):
         self.blinkCounter = 0
         self.counter = 0
         self.color = (255, 0, 255)
- 
+        self.yawn_num = 0
+
     def initialization(self):
-    
-        self.counter= 0
         self.blinkCounter=0
         self.ratioList = []
-
 
     def warning(self) :   # 잘 때
         query = "{{'{}':'{}'}}".format("status", "sleep")
@@ -40,15 +38,14 @@ class sub_model(QThread):
         dbs.dir.update(query)
         print("leave")
 
-    def yawning(self) : # 하품할 때
-        query = "{{'{}':'{}'}}".format("status", "yawning")
+    def normal(self):
+        query = "{{'{}':'{}'}}".format("status", "")
         query = eval(query)
         dbs.dir.update(query)
-        print("yawning")
+        print("leave")
 
     def run(self):
         while True:
-
             schedule.run_pending()
     
             if self.cap.get(cv2.CAP_PROP_POS_FRAMES) == self.cap.get(cv2.CAP_PROP_FRAME_COUNT):
@@ -56,35 +53,12 @@ class sub_model(QThread):
  
             success, img = self.cap.read()
             img, faces = self.detector.findFaceMesh(img, draw=False)
-    
  
             if faces:
                 face = faces[0]
+                self.normal()
 
- 
-        #입크기에 따른 하품 판단
-                self.mouthLeft= face[48]
-                self.mouthRight= face[54]
-                self.mouthUp= face[51]
-                self.mouthDown= face[57]
-                self.mouth_lenghtVer, _ = self.detector.findDistance(self.mouthUp, self.mouthDown)
-                self.mouth_lenghtHor, _ = self.detector.findDistance(self.mouthLeft, self.mouthRight)
-        
-                mouth_ratio = int((self.mouth_lenghtVer / self.mouth_lenghtHor) * 100)
-                self.mouth_ratioList.append(mouth_ratio)
-                if len(self.mouth_ratioList) > 3:
-                    self.mouth_ratioList.pop(0)
-                mouth_ratioAvg = sum(self.mouth_ratioList) / len(self.mouth_ratioList)
-        
-        
-                noseUp=face[27]
-                noseDown=face[30]
-                chin=face[8]
-        
-
-        
-        
-        #감고있는 거 # 자는거 체크
+        #감고있는 거 자는거 체크
                 leftUp = face[159]
                 leftDown = face[23]
                 leftLeft = face[130]
@@ -93,32 +67,25 @@ class sub_model(QThread):
                 lenghtHor, _ = self.detector.findDistance(leftLeft, leftRight)
 
  
-                ratio = int((lenghtVer / lenghtHor) * 100)
+                ratio=int((lenghtVer/lenghtHor)*100)
                 self.ratioList.append(ratio)
                 if len(self.ratioList) > 3:
                     self.ratioList.pop(0)
-                ratioAvg = sum(self.ratioList) / len(self.ratioList)
- 
-          
-                if ratioAvg > 32 :
+                ratioAvg=sum(self.ratioList) / len(self.ratioList)
+
+                if ratioAvg>32 :
                     self.initialization()
+                    self.normal()
                 else :
                     self.blinkCounter += 1
-                    print(self.blinkCounter)
-                if(self.blinkCounter>1000):
+                if self.blinkCounter > 1000 :
                     self.warning()
-                                 
-
-                if mouth_ratioAvg>80:
-                   self.yawning()
-            
 
             else:
                 self.leaving()
 
     
 if __name__ == "__main__":
-
     cv_cap = cv2.VideoCapture(0)
     sub = sub_model(cv_cap)
     sub.run()
