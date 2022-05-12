@@ -34,13 +34,14 @@ class Clientclass(QThread):
         self.client_info=[]           # 초깃값 설정
         self.classname=classname 
         self.users={}
-     
+        self.graph_client_log=[]
     #누구의 그래프를 받을지 이름 넘겨받음
     @pyqtSlot(str)
     def whosename(self, mix_info):
         self.mix_info=mix_info
-        print(self.mix_info)
-        
+        self.graph_client_name,self.graph_client_name=mix_info.split('_')
+        # print(self.mix_info)
+        self.graph_client_log=self.users[self.graph_client_name]['log']
 
     def run(self):      
         try:
@@ -51,11 +52,12 @@ class Clientclass(QThread):
                 self.log_list = []
                 self.que_size = 30
                 self.log_list={}
-
+                
                 for name in self.db_dict:
                     self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
                     self.student_info_dic = self.info_dir.get()
-                    self.users[name]=self.student_info_dic
+                    self.users[name]={}
+                    self.users[name]['info']=self.student_info_dic
                    
                     print("------------------------------------------------")
                     self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
@@ -74,7 +76,7 @@ class Clientclass(QThread):
                         for each in self.student_log:
                             self.log_list.append(self.student_log[each])
                     
-                    # self.users[name]['log']=self.log_list
+                    self.users[name]['log']=self.log_list
                     print(self.users)
                     self.log_list=[]
                     print("="*20)
@@ -167,10 +169,10 @@ class Host_window(QWidget, form_class):
                 item_refresh.setFont(QFont("Arial", 10, QFont.Bold))
 
             # print(users[each]['info'])
-            self.client_table.setItem(i,0,QTableWidgetItem(users[each]['학번']))
-            self.client_table.setItem(i,1,QTableWidgetItem(users[each]['이름']))
+            self.client_table.setItem(i,0,QTableWidgetItem(users[each]['info']['학번']))
+            self.client_table.setItem(i,1,QTableWidgetItem(users[each]['info']['이름']))
             self.client_table.setItem(i,2, item_refresh)
-            self.client_table.setItem(i,4,QTableWidgetItem(users[each]['IP']))
+            self.client_table.setItem(i,4,QTableWidgetItem(users[each]['info']['IP']))
             
         
         self.client_table.setSortingEnabled(True)

@@ -47,6 +47,7 @@ class CustomMainWindow(QWidget,form_class1):
 
 class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def __init__(self):
+        
         self.addedData = []
         # The data
         self.xlim = 200
@@ -133,11 +134,13 @@ class Communicate(QObject):
 ''' End Class '''
 
 
-
+@pyqtSlot(dict)
 def dataSendLoop(addData_callbackFunc):
+    
     # Setup the signal-slot mechanism.
     mySrc = Communicate()
     mySrc.data_signal.connect(addData_callbackFunc)
+    
 
     # Simulate some data
     n = np.linspace(0, 499, 500)
