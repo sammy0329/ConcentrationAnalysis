@@ -36,80 +36,45 @@ class Clientclass(QThread):
         self.users={}
 
     def run(self):      
-        # try:
-        #     while True:
-        #         dbs.dir = db.reference(self.classname)
-        #         self.db_dict = dbs.dir.get()
-        #         self.client_info=[]
-        #         self.log_list = []
-        #         self.que_size = 30
-        #         self.log_list={}
+        try:
+            while True:
+                dbs.dir = db.reference(self.classname)
+                self.db_dict = dbs.dir.get()
+                self.client_info=[]
+                self.log_list = []
+                self.que_size = 30
+                self.log_list={}
 
-        #         for name in self.db_dict:
-        #             self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
-        #             self.student_info_dic = self.info_dir.get()
-        #             self.users[name]=self.student_info_dic
-        #             print("!")
-        #             self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
-        #             self.student_log = self.log_dir.get()
-        #             print(name, len(self.student_log))
+                for name in self.db_dict:
+                    self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
+                    self.student_info_dic = self.info_dir.get()
+                    self.users[name]=self.student_info_dic
+                    print("!")
+                    self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
+                    self.student_log = self.log_dir.get()
+                    if self.student_log is None:
+                        self.student_log={}
+                    print(name, len(self.student_log))
 
-        #             if len(self.student_log)>=self.que_size:
-        #                 for i, each in enumerate(self.student_log):
-        #                     if len(self.student_log)-i <=self.que_size:
-        #                         self.log_list.append(self.student_log[each])
+                    if len(self.student_log)>=self.que_size:
+                        for i, each in enumerate(self.student_log):
+                            if len(self.student_log)-i <=self.que_size:
+                                self.log_list.append(self.student_log[each])
 
-        #             else:
-        #                 self.log_list = list(0 for i in range(self.que_size-len(self.student_log)))
-        #                 for each in self.student_log:
-        #                     self.log_list.append(self.student_log[each])
-                    
-        #             print(self.log_list)
-        #             self.log_list=[]
-        #             print("="*20)
-
-        #         self.timeout.emit(self.users)
-        
-        #         time.sleep(3)
-        # except:
-        #     print(error)
-        while True:
-            dbs.dir = db.reference(self.classname)
-            self.db_dict = dbs.dir.get()
-            self.client_info=[]
-            self.log_list = []
-            self.que_size = 30
-            self.student_log={}
-            print(len(self.student_log))
-
-            for name in self.db_dict:
-                self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
-                self.student_info_dic = self.info_dir.get()
-                self.users[name]=self.student_info_dic
-                print("!")
-                self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
-                self.student_log = self.log_dir.get()
-                if self.student_log is None:
-                    self.student_log={}
-                print(name, len(self.student_log))
-
-                if len(self.student_log)>=self.que_size:
-                    for i, each in enumerate(self.student_log):
-                        if len(self.student_log)-i <=self.que_size:
+                    else:
+                        self.log_list = list(0 for i in range(self.que_size-len(self.student_log)))
+                        for each in self.student_log:
                             self.log_list.append(self.student_log[each])
-
-                else:
-                    self.log_list = list(0 for i in range(self.que_size-len(self.student_log)))
-                    for each in self.student_log:
-                        self.log_list.append(self.student_log[each])
                     
-                print(self.log_list)
-                self.log_list=[]
-                print("="*20)
+                    print(self.log_list)
+                    self.log_list=[]
+                    print("="*20)
 
-            self.timeout.emit(self.users)
+                self.timeout.emit(self.users)
         
-            time.sleep(3)    
+                time.sleep(3)
+        except:
+            pass
             
   
 class Host_window(QWidget, form_class):
@@ -137,8 +102,6 @@ class Host_window(QWidget, form_class):
     
         #더블클릭시 클라이언트 이름 따오기
         client_IP = self.client_table.item(row, 4).text()
-        # print(clients[0])
-        # self.serverwindow.send_signal(clients[0])
         self.myGUI = CustomMainWindow()
         print(client_IP)
         for i in reversed(range(self.Graph_layout.count())):
@@ -215,26 +178,13 @@ class MainServer(QThread) :
     def viewCam(self):
       
         self.student_client = self.c_socket, (self.ip, self.port) = self.s_sock.accept()
-
         self.conn=self.c_socket
-            # if student_client not in clients :
         if self.student_client not in clients :
             clients.append(self.c_socket) #클라이언트 리스트에 클라이언트가 없다면 추가
                 
             print(self.ip + " : " + str(self.port) + "가 연결되었습니다.")
             
         while True:
-            # print('계속도는중')
-          
-            
-            # self.student_client = self.c_socket, (self.ip, self.port) = self.s_sock.accept()
-
-            # self.conn=self.c_socket
-            # # if student_client not in clients :
-            # if self.student_client not in clients :
-            #     clients.append(self.c_socket) #클라이언트 리스트에 클라이언트가 없다면 추가
-                
-            # print(self.ip + " : " + str(self.port) + "가 연결되었습니다.")
          
             # Retrieve message size
             while len(self.data) < self.payload_size:
@@ -253,19 +203,7 @@ class MainServer(QThread) :
 
             # Extract frame
             self.frame = pickle.loads(self.frame_data)
-            
-          
-            # read image in BGR format
-            # ret, image = frame.read()
-            # convert image to RGB format
-         
-         
-        #   rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-        # h, w, ch = rgb_image.shape
-        # bytes_per_line = ch * w
-        # convert_to_Qt_format = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
-        # p = convert_to_Qt_format.scaled(self.disply_width, self.display_height, Qt.KeepAspectRatio)
-        # return QPixmap.fromImage(p)
+
     
             self.image = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
             # get image infos
@@ -280,92 +218,6 @@ class MainServer(QThread) :
 
     def run(self):
         self.viewCam()
-       
-            # ret, frame = self.frame.read()
-            # if ret:
-            #     # https://stackoverflow.com/a/55468544/6622587
-            #     rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            #     h, w, ch = rgbImage.shape
-            #     bytesPerLine = ch * w
-            #     convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
-            #     p = convertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
-            #     self.changePixmap.emit(p)
-            
-            # self.viewCam(self.frame)
-            # print('ㅇㅇㅇ')
-            # self.rgbImage = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB) 
-            # self.convertToQtFormat = QImage(self.rgbImage.data, self.rgbImage.shape[1], self.rgbImage.shape[0], QImage.Format_RGB888) 
-            # self.pixmap = QPixmap(self.convertToQtFormat) 
-            # self.p = self.pixmap.scaled(400, 225, Qt.IgnoreAspectRatio) 
-            
-        
-            
-
-
-        
-    # def run(self) : #클라이언트가 접속할 때 실행되는 함수
-    #     while True :
-    #         student_client = c_socket, (ip, port) = self.s_sock.accept()
-
-     
-    #         # if student_client not in clients :
-    #         if c_socket not in clients :
-    #             clients.append(c_socket) #클라이언트 리스트에 클라이언트가 없다면 추가
-                
-    #         print(ip + " : " + str(port) + "가 연결되었습니다.")
-    #         print(c_socket)
-    #         self.show_address(c_socket,ip, port)
-    
-    # def show_address(self,c_socket, ip, port) : #호스트 채팅창에 ip와 port, 이름을 보여준다. 
-    #     info_message = ("{} : {} 가 연결되었습니다.".format(ip, port))
-    #     message_text = QTextBrowser()
-    #     message_text.setPlainText(info_message)
-        
-        
-    # def send_signal(self, socket) : #표 더블 클릭을 했을 때 클라이언트에게 시그널을 보내 영상을 요청한다.
-    #     signal_message = "1"
-    #     signal_message=signal_message.encode('utf-8')
-    #     socket.send(signal_message)
-    #     self.show_thread(socket)
-
-    # def show_thread(self, socket) : #시그널을 보낸 후 show_thread 실행
-    #     show_th = threading.Thread(target = self.show_video, args = (socket, ))
-    #     show_th.start()
-    
-    # # view camera
-    # def viewCam(self,show_image):
-    #     # read image in BGR format
-    #     ret, image = show_image
-    #     # convert image to RGB format
-    #     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    #     # get image infos
-    #     height, width, channel = image.shape
-    #     step = channel * width
-    #     # create QImage from image
-    #     qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
-    #     # show image in img_label
-    #     self.image_label.setPixmap(QPixmap.fromImage(qImg))
-
-    # def show_video(self, socket) : #호스트의 캔버스에 클라이언트의 영상을 보여준다.
-    #     while True :
-    #         try :
-    #             length = self.recvall(socket, 64)
-    #             receive_length = length.decode('utf-8')
-    #             stringData = self.recvall(socket, int(receive_length))
-    #             data = numpy.frombuffer(base64.b64decode(stringData), numpy.uint8)
-    #             show_image = cv2.imdecode(data, 1)
-    #             self.viewCam(show_image)
-    #         except :
-    #             socket.close()
-
-    # def recvall(sock, count) : #수신받은 후 buf 반환
-    #     buf = b''
-    #     while count:
-    #         newbuf = sock.recv(count)
-    #         if not newbuf: return None
-    #         buf += newbuf
-    #         count -= len(newbuf)
-    #     return buf
 
 
 if __name__ =='__main__':
