@@ -152,8 +152,8 @@ def dataSendLoop(addData_callbackFunc):
     while(True):
         if(i > 499):
             i = 0
-        # time.sleep(0.1)
-        time.sleep(1)
+        time.sleep(0.1)
+        # time.sleep(0.5)
         mySrc.data_signal.emit(y[i]) # <- Here you emit a signal!
         i += 1
     ###
