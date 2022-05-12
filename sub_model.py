@@ -5,12 +5,14 @@ from cvzone.PlotModule import LivePlot
 import schedule
 from PyQt5.QtCore import QThread
 import db_auth as dbs
+from firebase_admin import db
 
 class sub_model(QThread):
-    def __init__(self, cv_cap):
+    def __init__(self, cv_cap, base_dir):
         super().__init__()
         self.cap = cv_cap
-    
+        self.base_dir = base_dir + "/학생상태"
+
         self.detector = FaceMeshDetector(maxFaces=1)
         self.plotY = LivePlot(640, 360, [20, 50], invert=True)
 
@@ -26,23 +28,12 @@ class sub_model(QThread):
         self.blinkCounter=0
         self.ratioList = []
 
-    def warning(self) :   # 잘 때
-        query = "{{'{}':'{}'}}".format("status", "sleep")
+    def status_change(self, status):
+        query = "{{'{}':'{}'}}".format("status", status)
         query = eval(query)
+        dbs.dir = db.reference(self.base_dir)
         dbs.dir.update(query)
-        print("sleep")
-
-    def leaving(self) : # 얼굴 감지 안될 때
-        query = "{{'{}':'{}'}}".format("status", "leave")
-        query = eval(query)
-        dbs.dir.update(query)
-        print("leave")
-
-    def normal(self):
-        query = "{{'{}':'{}'}}".format("status", "")
-        query = eval(query)
-        dbs.dir.update(query)
-        print("normal")
+        print(status)
 
     def run(self):
         while True:
@@ -56,7 +47,7 @@ class sub_model(QThread):
  
             if faces:
                 face = faces[0]
-                self.normal()
+                self.status_change("normal")
 
         #감고있는 거 자는거 체크
                 leftUp = face[159]
@@ -75,17 +66,12 @@ class sub_model(QThread):
 
                 if ratioAvg>32 :
                     self.initialization()
-                    self.normal()
+                    self.status_change("normal")
                 else :
                     self.blinkCounter += 1
+
                 if self.blinkCounter > 1000 :
-                    self.warning()
+                    self.status_change("sleeping")
 
             else:
-                self.leaving()
-
-    
-if __name__ == "__main__":
-    cv_cap = cv2.VideoCapture(0)
-    sub = sub_model(cv_cap)
-    sub.run()
+                self.status_change("leaving")
