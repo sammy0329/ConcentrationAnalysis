@@ -18,12 +18,10 @@ import threading
 from PyQt5 import uic
 import random
 
-# form_class = uic.loadUiType('./ui/Widget_test.ui')[0]
 form_class1 = uic.loadUiType('./ui/graph.ui')[0]
 
 class CustomMainWindow(QWidget,form_class1):
     def __init__(self):
-        # super(CustomMainWindow, self).__init__()
         super().__init__()
         self.setupUi(self)
         

@@ -34,6 +34,13 @@ class Clientclass(QThread):
         self.client_info=[]           # 초깃값 설정
         self.classname=classname 
         self.users={}
+     
+    #누구의 그래프를 받을지 이름 넘겨받음
+    @pyqtSlot(str)
+    def whosename(self, mix_info):
+        self.mix_info=mix_info
+        print(self.mix_info)
+        
 
     def run(self):      
         try:
@@ -49,7 +56,8 @@ class Clientclass(QThread):
                     self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
                     self.student_info_dic = self.info_dir.get()
                     self.users[name]=self.student_info_dic
-                    print("!")
+                   
+                    print("------------------------------------------------")
                     self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
                     self.student_log = self.log_dir.get()
                     if self.student_log is None:
@@ -66,18 +74,21 @@ class Clientclass(QThread):
                         for each in self.student_log:
                             self.log_list.append(self.student_log[each])
                     
-                    print(self.log_list)
+                    # self.users[name]['log']=self.log_list
+                    print(self.users)
                     self.log_list=[]
                     print("="*20)
 
                 self.timeout.emit(self.users)
-        
+                
                 time.sleep(3)
         except:
             pass
             
   
 class Host_window(QWidget, form_class):
+    whose_graph = pyqtSignal(str)
+
     def __init__(self,classname):
         super().__init__()
         self.local_ip=socket.gethostbyname(hostname)
@@ -87,13 +98,16 @@ class Host_window(QWidget, form_class):
         self.cli.start()
         self.cli.timeout.connect(self.timeout)   # 시그널 슬롯 등록
         
+        self.whose_graph.connect(self.cli.whosename)
+        
         self.setupUI()
+
         self.show()
         
     def setupUI(self):
         self.client_table.doubleClicked.connect(self.tableWidget_doubleClicked)
         self.client_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.serverwindow = MainServer()   
+        self.serverwindow = MainServer()  
         self.serverwindow.changePixmap.connect(self.setImage)
         self.serverwindow.start()
         
@@ -102,6 +116,12 @@ class Host_window(QWidget, form_class):
     
         #더블클릭시 클라이언트 이름 따오기
         client_IP = self.client_table.item(row, 4).text()
+        self.client_num = self.client_table.item(row, 0).text()
+        self.client_name= self.client_table.item(row, 1).text()
+        self.client_mix=self.client_num+'_'+self.client_name
+
+        self.whose_graph.emit(self.client_mix)
+        
         self.myGUI = CustomMainWindow()
         print(client_IP)
         for i in reversed(range(self.Graph_layout.count())):
@@ -146,7 +166,7 @@ class Host_window(QWidget, form_class):
                 # item_refresh.setFont(QFont("Times", 7, QFont.Bold))
                 item_refresh.setFont(QFont("Arial", 10, QFont.Bold))
 
-            
+            # print(users[each]['info'])
             self.client_table.setItem(i,0,QTableWidgetItem(users[each]['학번']))
             self.client_table.setItem(i,1,QTableWidgetItem(users[each]['이름']))
             self.client_table.setItem(i,2, item_refresh)
