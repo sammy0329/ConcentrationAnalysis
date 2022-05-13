@@ -27,11 +27,11 @@ local_ip = socket.gethostbyname(hostname)
 clients = {} #클라이언트 리스트
 
 class Clientclass(QThread):
-    timeout = pyqtSignal(dict)    # 사용자 정의 시그널
+    timeout = pyqtSignal(dict) # 사용자 정의 시그널
     
     def __init__(self,classname):
         super().__init__()
-        self.client_info=[]           # 초깃값 설정
+        self.client_info=[] # 초깃값 설정
         self.classname=classname 
         self.users={}
         self.graph_client_log=[]
@@ -40,31 +40,30 @@ class Clientclass(QThread):
     def whosename(self, mix_info):
         self.mix_info=mix_info
         self.graph_client_name,self.graph_client_name=mix_info.split('_')
-        # print(self.mix_info)
         self.graph_client_log=self.users[self.graph_client_name]['log']
 
     def run(self):      
-        try:
-            while True:
-                dbs.dir = db.reference(self.classname)
-                self.db_dict = dbs.dir.get()
-                self.client_info=[]
-                self.log_list = []
-                self.que_size = 30
-                self.log_list={}
-                
+        while True:
+            dbs.dir = db.reference(self.classname)
+            self.db_dict = dbs.dir.get()
+            self.client_info=[]
+            self.log_list = []
+            self.que_size = 30
+            self.log_list={}
+            try:
+                i = 0
                 for name in self.db_dict:
+                    print(i)
+                    i+=1
                     self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
                     self.student_info_dic = self.info_dir.get()
                     self.users[name]={}
                     self.users[name]['info']=self.student_info_dic
-                   
-                    # print("------------------------------------------------")
+                    
                     self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
                     self.student_log = self.log_dir.get()
                     if self.student_log is None:
                         self.student_log={}
-                    # print(name, len(self.student_log))
 
                     if len(self.student_log)>=self.que_size:
                         for i, each in enumerate(self.student_log):
@@ -77,16 +76,14 @@ class Clientclass(QThread):
                             self.log_list.append(self.student_log[each])
                     
                     self.users[name]['log']=self.log_list
-               
-                    self.log_list=[]
-                    # print("="*20)
-
-                self.timeout.emit(self.users)
                 
-                time.sleep(3)
-        except:
-            pass
+                    self.log_list=[]
+            except:
+                pass
+
+            self.timeout.emit(self.users)
             
+            time.sleep(3)
   
 class Host_window(QWidget, form_class):
     whose_graph = pyqtSignal(str)
@@ -98,31 +95,28 @@ class Host_window(QWidget, form_class):
         self.classname=classname
         self.cli=Clientclass(self.classname)
         self.cli.start()
-        self.cli.timeout.connect(self.timeout)   # 시그널 슬롯 등록
-        
+        self.cli.timeout.connect(self.timeout) # 시그널 슬롯 등록
         self.whose_graph.connect(self.cli.whosename)
-        
         self.setupUI()
-
         self.show()
         
     def setupUI(self):
         self.client_table.doubleClicked.connect(self.tableWidget_doubleClicked)
         self.client_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.serverwindow = MainServer()
-        self.cam_signal.connect(self.serverwindow.click_event)#시그널 연결
+        self.cam_signal.connect(self.serverwindow.click_event) # 시그널 연결
         self.serverwindow.changePixmap.connect(self.setImage)
         self.serverwindow.start()
         
     def tableWidget_doubleClicked(self):
         row = self.client_table.currentIndex().row()
     
-        #더블클릭시 클라이언트 이름 따오기
+        # 더블클릭시 클라이언트 이름 따오기
         client_IP = self.client_table.item(row, 4).text()
         self.client_num = self.client_table.item(row, 0).text()
         self.client_name= self.client_table.item(row, 1).text()
         self.client_mix=self.client_num+'_'+self.client_name
-        self.cam_signal.emit(client_IP)#ip를 signal로 넘김
+        self.cam_signal.emit(client_IP) # ip를 signal로 넘김
         self.whose_graph.emit(self.client_mix)
         
         self.myGUI = CustomMainWindow()
@@ -169,7 +163,6 @@ class Host_window(QWidget, form_class):
                 # item_refresh.setFont(QFont("Times", 7, QFont.Bold))
                 item_refresh.setFont(QFont("Arial", 10, QFont.Bold))
 
-            # print(users[each]['info'])
             self.client_table.setItem(i,0,QTableWidgetItem(users[each]['info']['학번']))
             self.client_table.setItem(i,1,QTableWidgetItem(users[each]['info']['이름']))
             self.client_table.setItem(i,2, item_refresh)
@@ -252,11 +245,6 @@ class MainServer(QThread) :
                     else:
                         msg='No'
                         client_socket.send(msg.encode())
-                        
-                        #여기 어떻게 처리하지...?
-                        # if not self.data: 
-                        #     print('Disconnected by ' + addr[0],':',addr[1])
-                        #     break
 
 
             except ConnectionResetError as e:
@@ -268,10 +256,7 @@ class MainServer(QThread) :
                 
         client_socket.close() 
 
-
     def run(self):
-      
-            
         while True:
             print('wait')
             self.client_socket, self.addr = self.s_sock.accept() 
@@ -280,10 +265,6 @@ class MainServer(QThread) :
             if self.client_socket not in clients.values() :
                 clients[self.addr[0]]=self.client_socket #클라이언트 딕셔너리에 클라이언트가 없다면 추가 
                 print(clients)
-            
-           
-        
-
 
 if __name__ =='__main__':
     app = QApplication(sys.argv)

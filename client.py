@@ -16,6 +16,9 @@ import pickle
 import struct
 from sub_model import sub_model
 import threading
+from requests import get
+
+
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
 
@@ -31,7 +34,7 @@ seg_model.load_state_dict(torch.load(model_path))
 print(seg_model.summary())
 '''
 hostname = gethostname()
-local_ip = gethostbyname(hostname)
+local_ip=get('https://api.ipify.org').text
 
 def classifier(frame_input):
     frame_input = cv2.resize(frame_input, (256, 256), interpolation=cv2.INTER_LINEAR)
@@ -71,7 +74,7 @@ class Analysis_upload(QThread):
                 query = eval(query)
                 dbs.dir = db.reference(self.base_dir)
                 dbs.dir.update(query)
-                print(query)
+        
 
 class Client_window(QWidget,client_form_class):
     # class constructor

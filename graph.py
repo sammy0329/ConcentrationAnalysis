@@ -30,41 +30,27 @@ class CustomMainWindow(QWidget,form_class1):
         self.FRAME_A.setStyleSheet("QWidget { background-color: %s }" % QColor(210,210,235,255).name())
       
         self.myFig = CustomFigCanvas()
-        # self.Graph_layout.addWidget(self.myFig)
 
         # Add the callbackfunc to ..
         myDataLoop = threading.Thread(name = 'myDataLoop', target = dataSendLoop, daemon = True, args = (self.addData_callbackFunc,))
         myDataLoop.start()
-        # self.show()
         return 
 
     def addData_callbackFunc(self, value):
         self.myFig.addData(value)
         return
 
-''' End Class '''
-
-
 class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def __init__(self):
-        
         self.addedData = []
-        # The data
+        
         self.xlim = 200
         self.n = np.linspace(0, self.xlim - 1, self.xlim)
-        # a = []
-        # b = []
-        # a.append(2.0)
-        # a.append(4.0)
-        # a.append(2.0)
-        # b.append(4.0)
-        # b.append(3.0)
-        # b.append(4.0)
         self.y = (self.n * 0.0) + 50
 
         # The window
         self.fig = Figure(figsize=(5,5), dpi=100)
-        self.fig.subplots_adjust(0.1, 0.25, 0.98, 0.9)# left,bottom,right,top 
+        self.fig.subplots_adjust(0.1, 0.25, 0.98, 0.9) # left,bottom,right,top 
         self.ax1 = self.fig.add_subplot(111)
         
         # self.ax1 settings
@@ -97,7 +83,6 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         return
 
     def _step(self, *args):
-        # Extends the _step() method for the TimedAnimation class.
         try:
             TimedAnimation._step(self, *args)
         except Exception as e:
@@ -120,29 +105,14 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         self._drawn_artists = [self.line1, self.line1_tail, self.line1_head]
         return
 
-''' End Class '''
-
-
-# You need to setup a signal slot mechanism, to
-# send data to your GUI in a thread-safe way.
-# Believe me, if you don't do this right, things
-# go very very wrong..
-
 class Communicate(QObject):
     data_signal = pyqtSignal(float)
 
-''' End Class '''
-
-
 @pyqtSlot(dict)
 def dataSendLoop(addData_callbackFunc):
-    
-    # Setup the signal-slot mechanism.
     mySrc = Communicate()
     mySrc.data_signal.connect(addData_callbackFunc)
     
-
-    # Simulate some data
     n = np.linspace(0, 499, 500)
     # y = 50 + 25*(np.sin(n / 8.3)) + 10*(np.sin(n / 7.5)) - 5*(np.sin(n / 1.5))
     y=[]
@@ -157,8 +127,6 @@ def dataSendLoop(addData_callbackFunc):
         # time.sleep(0.5)
         mySrc.data_signal.emit(y[i]) # <- Here you emit a signal!
         i += 1
-    ###
-###
 
 if __name__== '__main__':
     app = QApplication(sys.argv)
