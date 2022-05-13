@@ -17,7 +17,8 @@ import struct
 from sub_model import sub_model
 import threading
 from requests import get
-
+import torch
+from model.models.resmasking import resmasking50_dropout1
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
@@ -25,19 +26,21 @@ client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
 prdeict_list = ["놀람", "슬픔", "무표정", "행복", "공포", "역겨움", "분노"]
 weight_list = [0.1, 0.1, 1, 0.2, 0.1, 0.1, 0.1]
 
-model_path = "C:/test_model.h5"
-seg_model = tf.keras.models.load_model(model_path)
-'''
-model_path = "C:/model.pt"
-seg_model = models.__dict__["resmasking_dropout1"]
-seg_model.load_state_dict(torch.load(model_path))
-print(seg_model.summary())
-'''
+# model_path = "C:/test_model.h5"
+# seg_model = tf.keras.models.load_model(model_path)
+
+model_path = "C:/res_model.pt"
+seg_model = torch.load(model_path)
+seg_model.eval()
+print("checkpoint")
+# print(seg_model.summary())
+
 hostname = gethostname()
 local_ip=get('https://api.ipify.org').text
 
 def classifier(frame_input):
-    frame_input = cv2.resize(frame_input, (256, 256), interpolation=cv2.INTER_LINEAR)
+    frame_input = cv2.resize(frame_input, (224, 224), interpolation=cv2.INTER_LINEAR)
+    frame_input = cv2.cvtColor(cv2.COLOR_BGR2GRAY)
     frame_input = np.array(frame_input)
     result = seg_model.predict(np.array([frame_input]))
 
