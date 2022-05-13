@@ -32,11 +32,13 @@ class CustomMainWindow(QWidget,form_class1):
         self.myFig = CustomFigCanvas()
 
         # Add the callbackfunc to ..
-        myDataLoop = threading.Thread(name = 'myDataLoop', target = dataSendLoop, daemon = True, args = (self.addData_callbackFunc,))
-        myDataLoop.start()
+        # myDataLoop = threading.Thread(name = 'myDataLoop', target = dataSendLoop, daemon = True, args = (self.addData_callbackFunc,))
+        # myDataLoop.start()
         return 
 
     def addData_callbackFunc(self, value):
+        self.mylist=value
+        
         self.myFig.addData(value)
         return
 
@@ -44,7 +46,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
     def __init__(self):
         self.addedData = []
         
-        self.xlim = 200
+        self.xlim = 60
         self.n = np.linspace(0, self.xlim - 1, self.xlim)
         self.y = (self.n * 0.0) + 50
 
@@ -63,7 +65,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         self.ax1.add_line(self.line1_tail)
         self.ax1.add_line(self.line1_head)
         self.ax1.set_xlim(0, self.xlim - 1)
-        self.ax1.set_ylim(0, 100)
+        self.ax1.set_ylim(0, 1.0)
 
         FigureCanvas.__init__(self, self.fig)
         TimedAnimation.__init__(self, self.fig, interval = 50, blit = True)
@@ -79,18 +81,20 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         return
 
     def addData(self, value):
-        self.addedData.append(value)
+        # self.addedData.append(value)
+        self.addedData=value
+        print(self.addedData)
         return
 
-    def _step(self, *args):
-        try:
-            TimedAnimation._step(self, *args)
-        except Exception as e:
-            self.abc += 1
-            print(str(self.abc))
-            TimedAnimation._stop(self)
-            pass
-        return
+    # def _step(self, *args):
+    #     try:
+    #         TimedAnimation._step(self, *args)
+    #     except Exception as e:
+    #         self.abc += 1
+    #         print(str(self.abc))
+    #         TimedAnimation._stop(self)
+    #         pass
+    #     return
 
     def _draw_frame(self, framedata):
         margin = 2
@@ -105,28 +109,28 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         self._drawn_artists = [self.line1, self.line1_tail, self.line1_head]
         return
 
-class Communicate(QObject):
-    data_signal = pyqtSignal(float)
+# class Communicate(QObject):
+#     data_signal = pyqtSignal(float)
 
-@pyqtSlot(dict)
-def dataSendLoop(addData_callbackFunc):
-    mySrc = Communicate()
-    mySrc.data_signal.connect(addData_callbackFunc)
+# @pyqtSlot(dict)
+# def dataSendLoop(addData_callbackFunc):
+#     mySrc = Communicate()
+#     mySrc.data_signal.connect(addData_callbackFunc)
     
-    n = np.linspace(0, 499, 500)
-    # y = 50 + 25*(np.sin(n / 8.3)) + 10*(np.sin(n / 7.5)) - 5*(np.sin(n / 1.5))
-    y=[]
-    for i in range(100):
-        y.append(random.randint(0,100))
-    i = 0
+#     n = np.linspace(0, 499, 500)
+#     # y = 50 + 25*(np.sin(n / 8.3)) + 10*(np.sin(n / 7.5)) - 5*(np.sin(n / 1.5))
+#     y=[]
+#     for i in range(100):
+#         y.append(random.randint(0,100))
+#     i = 0
 
-    while(True):
-        if(i > 499):
-            i = 0
-        time.sleep(0.1)
-        # time.sleep(0.5)
-        mySrc.data_signal.emit(y[i]) # <- Here you emit a signal!
-        i += 1
+#     while(True):
+#         if(i > 60):
+#             break
+#         time.sleep(0.1)
+#         # time.sleep(0.5)
+#         mySrc.data_signal.emit(y[i]) # <- Here you emit a signal!
+#         i += 1
 
 if __name__== '__main__':
     app = QApplication(sys.argv)
