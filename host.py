@@ -25,7 +25,7 @@ exlist=[]
 hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
 clients = {} #클라이언트 리스트
-
+whoosegraph=[]
 class Clientclass(QThread):
     timeout = pyqtSignal(dict) # 사용자 정의 시그널
     
@@ -36,24 +36,28 @@ class Clientclass(QThread):
         self.users={}
         self.graph_client_log=[]
     #누구의 그래프를 받을지 이름 넘겨받음
+    
     @pyqtSlot(str)
     def whosename(self, mix_info):
         self.mix_info=mix_info
         self.graph_client_name,self.graph_client_name=mix_info.split('_')
         self.graph_client_log=self.users[self.graph_client_name]['log']
-
+        global whoosegraph
+        whoosegraph=self.graph_client_log
+        
+    
     def run(self):      
         while True:
             dbs.dir = db.reference(self.classname)
             self.db_dict = dbs.dir.get()
             self.client_info=[]
             self.log_list = []
-            self.que_size = 30
+            self.que_size = 200
             self.log_list={}
             try:
                 i = 0
                 for name in self.db_dict:
-                    print(i)
+                    
                     i+=1
                     self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
                     self.student_info_dic = self.info_dir.get()
@@ -84,7 +88,7 @@ class Clientclass(QThread):
             self.timeout.emit(self.users)
             
             time.sleep(3)
-  
+
 class Host_window(QWidget, form_class):
     whose_graph = pyqtSignal(str)
     cam_signal=pyqtSignal(str)
@@ -119,13 +123,22 @@ class Host_window(QWidget, form_class):
         self.cam_signal.emit(client_IP) # ip를 signal로 넘김
         self.whose_graph.emit(self.client_mix)
         
+        # my_list=[]
+        # for i in range(100):
+        #     my_list.append(i)
+       
         self.myGUI = CustomMainWindow()
+        self.myGUI.addData_callbackFunc(whoosegraph)
+       
         
         for i in reversed(range(self.Graph_layout.count())):
             self.Graph_layout.removeItem(self.Graph_layout.itemAt(i))
 
         self.Graph_layout.addWidget(self.myGUI.myFig)
     
+    
+            
+            
     @pyqtSlot(QImage)
     def setImage(self, image):
         self.image_label.setPixmap(QPixmap.fromImage(image))
