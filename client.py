@@ -15,34 +15,43 @@ from socket import *
 import pickle
 import struct
 from sub_model import sub_model
-import threading
 from requests import get
 import torch
 from model.models.resmasking import resmasking50_dropout1
+from torchvision.transforms import transforms
+import torch.nn.functional as F
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
 
-prdeict_list = ["놀람", "슬픔", "무표정", "행복", "공포", "역겨움", "분노"]
-weight_list = [0.1, 0.1, 1, 0.2, 0.1, 0.1, 0.1]
-
-# model_path = "C:/test_model.h5"
-# seg_model = tf.keras.models.load_model(model_path)
+prdeict_list = ['분노', '역겨움', '공포', '행복', '슬픔', '놀람', '무표정']
+weight_list = [0.1, 0.1, 0.1, 0.2, 0.1, 0.1, 1]
 
 model_path = "C:/res_model.pt"
 seg_model = torch.load(model_path)
 seg_model.eval()
-print("checkpoint")
-# print(seg_model.summary())
 
 hostname = gethostname()
 local_ip=get('https://api.ipify.org').text
 
+transform = transforms.Compose(
+            [
+                transforms.ToPILImage(),
+                transforms.ToTensor(),
+            ]
+)
+
 def classifier(frame_input):
     frame_input = cv2.resize(frame_input, (224, 224), interpolation=cv2.INTER_LINEAR)
-    frame_input = cv2.cvtColor(cv2.COLOR_BGR2GRAY)
+    frame_input = cv2.cvtColor(frame_input, cv2.COLOR_BGR2GRAY)
     frame_input = np.array(frame_input)
-    result = seg_model.predict(np.array([frame_input]))
+    frame_input = np.dstack([frame_input] * 3)
+    frame_input = transform(frame_input)
+    frame_input = frame_input.reshape(1,3,224,224)
+    # frame_input.to(torch.device('cuda'))
+    result = seg_model(frame_input)
+    result = F.softmax(result, dim=1)
+    result = result.tolist()[0]
 
     return result
 
@@ -63,8 +72,7 @@ class Analysis_upload(QThread):
                 break
 
             if self.frame_counter % self.fps == 0:
-                result_vector = classifier(frame)
-                result_list = result_vector.reshape(-1)
+                result_list = classifier(frame)
                 concent_rate = 0
 
                 for i, each in enumerate(result_list):
@@ -77,7 +85,6 @@ class Analysis_upload(QThread):
                 query = eval(query)
                 dbs.dir = db.reference(self.base_dir)
                 dbs.dir.update(query)
-        
 
 class Client_window(QWidget,client_form_class):
     # class constructor

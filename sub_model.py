@@ -33,7 +33,6 @@ class sub_model(QThread):
         query = eval(query)
         dbs.dir = db.reference(self.base_dir)
         dbs.dir.update(query)
-        print(status)
 
     def run(self):
         while True:
@@ -49,7 +48,7 @@ class sub_model(QThread):
                 face = faces[0]
                 self.status_change("normal")
 
-        #감고있는 거 자는거 체크
+        # 감고있는 거 자는거 체크
                 leftUp = face[159]
                 leftDown = face[23]
                 leftLeft = face[130]
@@ -67,11 +66,14 @@ class sub_model(QThread):
                 if ratioAvg>32 :
                     self.initialization()
                     self.status_change("normal")
+                    print("check1")
                 else :
                     self.blinkCounter += 1
 
                 if self.blinkCounter > 1000 :
                     self.status_change("sleeping")
+                    print("check2")
 
             else:
                 self.status_change("leaving")
+                print("check3")
