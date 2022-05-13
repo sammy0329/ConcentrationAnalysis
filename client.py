@@ -124,24 +124,32 @@ class SendVideo(QThread):
 
     def send_video(self) : #서버(호스트)로부터 요청을 받았을 때 영상을 전송해주는 함수
         while True:
-            ret,frame=self.cap.read()
-            # Serialize frame
-            self.data = pickle.dumps(frame)
+            # self.server_socket, self.addr = self.soc.accept()
+            reReady = self.soc.recv(1024)
+            reReady=reReady.decode()
+            if reReady == "Yes":
+                
+                ret,frame=self.cap.read()
+                # Serialize frame
+                self.data = pickle.dumps(frame)
 
-            # Send message length first
-            self.message_size = struct.pack("L", len(self.data)) ### CHANGED
+                # Send message length first
+                self.message_size = struct.pack("L", len(self.data)) ### CHANGED
 
-            # Then data
-            self.soc.sendall(self.message_size + self.data)
-            # print("일하는중")
+                # Then data
+                self.soc.sendall(self.message_size + self.data)
+            elif reReady=="No":
+                return
+           
 
     def run(self):    
         self.soc = socket(AF_INET, SOCK_STREAM)
 
         host = self.ip # 서버 아이피
         port = 2500 # 서버 포트
-
+        self.myip=local_ip
         self.soc.connect( (host, port) ) # 서버측으로 연결한다.
+      
         # print (soc.recv(1024)) # 서버측에서 보낸 데이터 1024 버퍼만큼 받는다.
         self.send_video()
 

@@ -1,4 +1,4 @@
-from psutil import users
+# from psutil import users
 from graph import *
 import db_auth as dbs
 from firebase_admin import db
@@ -24,7 +24,7 @@ client_info=[]
 exlist=[]
 hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
-clients = [] #클라이언트 리스트
+clients = {} #클라이언트 리스트
 
 class Clientclass(QThread):
     timeout = pyqtSignal(dict)    # 사용자 정의 시그널
@@ -59,12 +59,12 @@ class Clientclass(QThread):
                     self.users[name]={}
                     self.users[name]['info']=self.student_info_dic
                    
-                    print("------------------------------------------------")
+                    # print("------------------------------------------------")
                     self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
                     self.student_log = self.log_dir.get()
                     if self.student_log is None:
                         self.student_log={}
-                    print(name, len(self.student_log))
+                    # print(name, len(self.student_log))
 
                     if len(self.student_log)>=self.que_size:
                         for i, each in enumerate(self.student_log):
@@ -77,9 +77,9 @@ class Clientclass(QThread):
                             self.log_list.append(self.student_log[each])
                     
                     self.users[name]['log']=self.log_list
-                    print(self.users)
+               
                     self.log_list=[]
-                    print("="*20)
+                    # print("="*20)
 
                 self.timeout.emit(self.users)
                 
@@ -90,7 +90,7 @@ class Clientclass(QThread):
   
 class Host_window(QWidget, form_class):
     whose_graph = pyqtSignal(str)
-
+    cam_signal=pyqtSignal(str)
     def __init__(self,classname):
         super().__init__()
         self.local_ip=socket.gethostbyname(hostname)
@@ -109,7 +109,8 @@ class Host_window(QWidget, form_class):
     def setupUI(self):
         self.client_table.doubleClicked.connect(self.tableWidget_doubleClicked)
         self.client_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.serverwindow = MainServer()  
+        self.serverwindow = MainServer()
+        self.cam_signal.connect(self.serverwindow.click_event)#시그널 연결
         self.serverwindow.changePixmap.connect(self.setImage)
         self.serverwindow.start()
         
@@ -121,11 +122,11 @@ class Host_window(QWidget, form_class):
         self.client_num = self.client_table.item(row, 0).text()
         self.client_name= self.client_table.item(row, 1).text()
         self.client_mix=self.client_num+'_'+self.client_name
-
+        self.cam_signal.emit(client_IP)#ip를 signal로 넘김
         self.whose_graph.emit(self.client_mix)
         
         self.myGUI = CustomMainWindow()
-        print(client_IP)
+        
         for i in reversed(range(self.Graph_layout.count())):
             self.Graph_layout.removeItem(self.Graph_layout.itemAt(i))
 
@@ -177,6 +178,7 @@ class Host_window(QWidget, form_class):
         
         self.client_table.setSortingEnabled(True)
 
+
 class MainServer(QThread) :
     changePixmap = pyqtSignal(QImage)
     
@@ -186,7 +188,7 @@ class MainServer(QThread) :
         # self.ip = ""
         self.ip=local_ip
         self.port = 2500 #우선 포트 번호 2500으로 고정. 나중에 수정 가능
-        self.s_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #다중 접속 방지
+        # self.s_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #다중 접속 방지
         self.s_sock.bind((self.ip, self.port)) #ip와 port를 바인드
         print('Socket bind complete')
         self.s_sock.listen(100) #접속자 100명까지
@@ -194,52 +196,93 @@ class MainServer(QThread) :
         
         self.data = b'' ### CHANGED
         self.payload_size = struct.calcsize("L") ### CHANGED
+        self.clicked_ip=''
 
+    #click이벤트에서 값 받아옴
+    @pyqtSlot(str)
+    def click_event(self,clicked_ip):
+        self.clicked_ip=clicked_ip
+        
+    # 쓰레드에서 실행되는 코드입니다. 
+    # 접속한 클라이언트마다 새로운 쓰레드가 생성되어 통신을 하게 됩니다. 
+    def threaded(self,client_socket, addr): 
 
+        print('Connected by :', addr[0], ':', addr[1]) 
 
-    def viewCam(self):
-      
-        self.student_client = self.c_socket, (self.ip, self.port) = self.s_sock.accept()
-        self.conn=self.c_socket
-        if self.student_client not in clients :
-            clients.append(self.c_socket) #클라이언트 리스트에 클라이언트가 없다면 추가
+        # 클라이언트가 접속을 끊을 때 까지 반복합니다. 
+        while True: 
+            #click이벤트 받으면 그 사람의 소켓번호 들고옴
+            try:
+                if self.clicked_ip: 
+                    if clients[self.clicked_ip]==client_socket:
+                        msg='Yes'
+                        client_socket.send(msg.encode())
+                        # 데이터가 수신되면 클라이언트에 다시 전송합니다.(에코)
+                        self.data = client_socket.recv(4096)
+                        
+                        # Retrieve message size
+                        while len(self.data) < self.payload_size:
+                            self.data +=  self.client_socket.recv(4096)
+
+                        packed_msg_size = self.data[:self.payload_size]
+                        self.data = self.data[self.payload_size:]
+                        msg_size = struct.unpack("L", packed_msg_size)[0] ### CHANGED
+
+                        # Retrieve all data based on message size
+                        while len(self.data) < msg_size:
+                            self.data +=  self.client_socket.recv(4096)
+
+                        self.frame_data = self.data[:msg_size]
+                        self.data = self.data[msg_size:]
+
+                        # Extract frame
+                        self.frame = pickle.loads(self.frame_data)
+
                 
-            print(self.ip + " : " + str(self.port) + "가 연결되었습니다.")
-            
-        while True:
-         
-            # Retrieve message size
-            while len(self.data) < self.payload_size:
-                self.data +=  self.conn.recv(4096)
+                        self.image = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
+                        # get image infos
+                        height, width, channel = self.image.shape
+                        step = channel * width
+                        # create QImage from image
+                        self.qImg = QImage(self.image.data, width, height, step, QImage.Format_RGB888)
+                        
+                        # show image in img_label
+                        self.changePixmap.emit(self.qImg)
+                       
+                    else:
+                        msg='No'
+                        client_socket.send(msg.encode())
+                        
+                        #여기 어떻게 처리하지...?
+                        # if not self.data: 
+                        #     print('Disconnected by ' + addr[0],':',addr[1])
+                        #     break
 
-            packed_msg_size = self.data[:self.payload_size]
-            self.data = self.data[self.payload_size:]
-            msg_size = struct.unpack("L", packed_msg_size)[0] ### CHANGED
 
-            # Retrieve all data based on message size
-            while len(self.data) < msg_size:
-                self.data +=  self.conn.recv(4096)
+            except ConnectionResetError as e:
 
-            self.frame_data = self.data[:msg_size]
-            self.data = self.data[msg_size:]
+                print('Disconnected by ' + addr[0],':',addr[1])
+                del(clients[addr[0]])
+                print(clients)
+                break
+                
+        client_socket.close() 
 
-            # Extract frame
-            self.frame = pickle.loads(self.frame_data)
-
-    
-            self.image = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
-            # get image infos
-            height, width, channel = self.image.shape
-            step = channel * width
-            # create QImage from image
-            self.qImg = QImage(self.image.data, width, height, step, QImage.Format_RGB888)
-            
-            # show image in img_label
-            self.changePixmap.emit(self.qImg)
-            # self.image_label.setPixmap(QPixmap.fromImage(qImg))
 
     def run(self):
-        self.viewCam()
+      
+            
+        while True:
+            print('wait')
+            self.client_socket, self.addr = self.s_sock.accept() 
+            start_new_thread(self.threaded, (self.client_socket, self.addr))
+            
+            if self.client_socket not in clients.values() :
+                clients[self.addr[0]]=self.client_socket #클라이언트 딕셔너리에 클라이언트가 없다면 추가 
+                print(clients)
+            
+           
+        
 
 
 if __name__ =='__main__':
