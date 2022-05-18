@@ -172,12 +172,14 @@ p, li { white-space: pre-wrap; }
      <string>ip</string>
     </property>
    </column>
-   <column>
-    <property name="text">
-     <string>port</string>
-    </property>
-   </column>
   </widget>
+  <zorder>Message_box</zorder>
+  <zorder>Concentration_box</zorder>
+  <zorder>ClientInfo_box</zorder>
+  <zorder>groupBox</zorder>
+  <zorder>message_TextBrowser</zorder>
+  <zorder>UserCam_box</zorder>
+  <zorder>client_table</zorder>
  </widget>
  <resources/>
  <connections/>

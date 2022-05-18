@@ -1,8 +1,5 @@
 import cv2
-import cvzone
 from cvzone.FaceMeshModule import FaceMeshDetector
-from cvzone.PlotModule import LivePlot
-import schedule
 from PyQt5.QtCore import QThread
 import db_auth as dbs
 from firebase_admin import db
@@ -14,16 +11,10 @@ class sub_model(QThread):
         self.base_dir = base_dir + "/학생상태"
 
         self.detector = FaceMeshDetector(maxFaces=1)
-        self.plotY = LivePlot(640, 360, [20, 50], invert=True)
+        self.ratioList = []        
+        self.blinkCounter = 0 
 
-        self.ratioList = []
-        self.mouth_ratioList=[]
-        self.nose_ratioList=[]
-        self.blinkCounter = 0
-        self.counter = 0
-        self.color = (255, 0, 255)
-        self.yawn_num = 0
-
+        
     def initialization(self):
         self.blinkCounter=0
         self.ratioList = []
@@ -36,7 +27,6 @@ class sub_model(QThread):
 
     def run(self):
         while True:
-            schedule.run_pending()
     
             if self.cap.get(cv2.CAP_PROP_POS_FRAMES) == self.cap.get(cv2.CAP_PROP_FRAME_COUNT):
                 self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
@@ -47,9 +37,7 @@ class sub_model(QThread):
             if faces:
                 face = faces[0]
                 self.status_change("normal")
-
-        # 감고있는 거 자는거 체크
-                leftUp = face[159]
+                leftUp = face[27]
                 leftDown = face[23]
                 leftLeft = face[130]
                 leftRight = face[243]

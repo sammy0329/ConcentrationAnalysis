@@ -1,5 +1,5 @@
-from host import *
-from client import *
+from test_server import *
+from test_client import *
 from cryptography.fernet import Fernet
 import json
 

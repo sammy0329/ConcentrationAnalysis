@@ -6,6 +6,7 @@ from PyQt5.QtGui import QImage
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import QThread
+import tensorflow as tf
 import numpy as np
 import db_auth as dbs
 from firebase_admin import db
@@ -19,7 +20,6 @@ import torch
 from model.models.resmasking import resmasking50_dropout1
 from torchvision.transforms import transforms
 import torch.nn.functional as F
-from PyQt5.QtCore import QCoreApplication
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
@@ -32,9 +32,8 @@ seg_model = torch.load(model_path)
 seg_model.eval()
 
 hostname = gethostname()
+# local_ip= gethostbyname(hostname)
 local_ip=get('https://api.ipify.org').text
-# local_ip = gethostbyname(hostname)
-
 transform = transforms.Compose(
             [
                 transforms.ToPILImage(),
@@ -104,10 +103,7 @@ class Client_window(QWidget,client_form_class):
         # set timer timeout callback function
         self.timer.timeout.connect(self.viewCam)
         self.controlTimer()
-        
 
-    
-        
     # view camera
     def viewCam(self):
         # read image in BGR format
@@ -139,26 +135,17 @@ class SendVideo(QThread):
         self.cap = cv_cap
         self.ip=server_ip
 
-
-
-    
     def send_video(self) : #서버(호스트)로부터 요청을 받았을 때 영상을 전송해주는 함수
         while True:
             # self.server_socket, self.addr = self.soc.accept()
-            
-            try:           
-                ret,frame=self.cap.read()
+                
+            ret,frame=self.cap.read()
                 # Serialize frame
-                self.data = pickle.dumps(frame)
-
-                # Send message length first
-                self.message_size = struct.pack("L", len(self.data)) ### CHANGED
-
-                # Then data
-                self.soc.sendall(self.message_size + self.data)
-            
-            except:
-                QCoreApplication.quit()
+            retval, frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])    
+            frame = pickle.dumps(frame)
+            self.soc.sendall(struct.pack(">L", len(frame)) + frame)
+            print("보내는중")
+           
 
     def run(self):    
         self.soc = socket(AF_INET, SOCK_STREAM)
@@ -167,15 +154,13 @@ class SendVideo(QThread):
         port = 2500 # 서버 포트
         self.myip=local_ip
         self.soc.connect( (host, port) ) # 서버측으로 연결한다.
-      
+        print("연결 성공")
         # print (soc.recv(1024)) # 서버측에서 보낸 데이터 1024 버퍼만큼 받는다.
         self.send_video()
 
         # self.soc.send("Client. Hello!!!") # 서버측으로 문자열을 보낸다.
         # self.soc.close() # 연결 종료
-        
-   
-        
+
 class Client_info_window(QWidget, client_info_form_class):
     def __init__(self, dir_name, server_ip):
         super().__init__()
@@ -190,7 +175,7 @@ class Client_info_window(QWidget, client_info_form_class):
         self.StudentNumber = self.StudentNumber_text.text() # line_edit text 값 가져오기 
         self.StudentName = self.Name_text.text()
         self.SutdentIP = self.client_ip # IP 변수로 수정해야함
-     
+        self.StudentPort = 5717 # 포트 변수로 수정해야함
         
         self.directory = self.dir_name  + "/" + self.StudentName + "/학생정보"
         dbs.dir = db.reference(self.directory)
@@ -207,7 +192,9 @@ class Client_info_window(QWidget, client_info_form_class):
         self.query = eval(self.query)
         dbs.dir.update(self.query)
 
-
+        self.query = "{{'{}':'{}'}}".format("Port", self.StudentPort)
+        self.query = eval(self.query)
+        dbs.dir.update(self.query)
 
         self.directory_base= self.dir_name  + "/" + self.StudentName
         
