@@ -7,6 +7,8 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import socket
+import random
+import threading
 import cv2
 from PyQt5.QtGui import QPixmap
 import pickle
@@ -14,13 +16,20 @@ import struct
 from _thread import *
 
 form_class = uic.loadUiType('./ui/host.ui')[0]
+
 client_info=[]
 exlist=[]
 hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
-clients = {} #클라이언트 딕셔너리
+clients = {} #클라이언트 리스트
 whoosegraph=[]
-users={}
+global select_client_ip
+select_client_ip = "main"
+changePixmap = pyqtSignal(QImage)
+global user_dict
+user_dict = {"main":0}
+
+
 class Clientclass(QThread):
     timeout = pyqtSignal(dict) # 사용자 정의 시그널
     
@@ -28,40 +37,36 @@ class Clientclass(QThread):
         super().__init__()
         self.client_info=[] # 초깃값 설정
         self.classname=classname 
+        self.users={}
         self.graph_client_log=[]
     #누구의 그래프를 받을지 이름 넘겨받음
     
     @pyqtSlot(str)
     def whosename(self, mix_info):
         self.mix_info=mix_info
-        # self.graph_client_name,self.graph_client_name=mix_info.split('_')
-        try:
-            self.graph_client_log=users[self.mix_info]['log']
-            global whoosegraph
-            whoosegraph=self.graph_client_log
-        except:
-            pass
+        self.graph_client_name,self.graph_client_name=mix_info.split('_')
+        self.graph_client_log=self.users[self.graph_client_name]['log']
+        global whoosegraph
+        whoosegraph=self.graph_client_log
         
     
     def run(self):      
         while True:
-            
             dbs.dir = db.reference(self.classname)
             self.db_dict = dbs.dir.get()
             self.client_info=[]
             self.log_list = []
             self.que_size = 200
             self.log_list={}
-            
             try:
                 i = 0
                 for name in self.db_dict:
+                    
                     i+=1
                     self.info_dir = db.reference(self.classname+"/"+name+"/"+"학생정보")
                     self.student_info_dic = self.info_dir.get()
-                    users[self.student_info_dic['학번']+'_'+name]={}
-                    users[self.student_info_dic['학번']+'_'+name]['info']=self.student_info_dic
-                    # print(self.student_info_dic['학번'])
+                    self.users[name]={}
+                    self.users[name]['info']=self.student_info_dic
                     
                     self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
                     self.student_log = self.log_dir.get()
@@ -78,30 +83,22 @@ class Clientclass(QThread):
                         for each in self.student_log:
                             self.log_list.append(self.student_log[each])
                     
-                    users[self.student_info_dic['학번']+'_'+name]['log']=self.log_list
+                    self.users[name]['log']=self.log_list
                 
                     self.log_list=[]
-                   
-                    try: 
-                        self.status_dir = db.reference(self.classname+"/"+name+"/"+"학생상태")
-                        self.student_status=self.status_dir.get()
-                        users[self.student_info_dic['학번']+'_'+name]['status']=self.student_status['status']
-                    
-                    except:                       
-                        users[self.student_info_dic['학번']+'_'+name]['status']=''                 
-                         
             except:
                 pass
 
-            self.timeout.emit(users)
+            self.timeout.emit(self.users)
             
-            time.sleep(1)
+            time.sleep(3)
 
 class Host_window(QWidget, form_class):
     whose_graph = pyqtSignal(str)
     cam_signal=pyqtSignal(str)
     def __init__(self,classname):
         super().__init__()
+        global select_client_ip
         self.local_ip=socket.gethostbyname(hostname)
         self.setupUi(self)
         self.classname=classname
@@ -112,26 +109,29 @@ class Host_window(QWidget, form_class):
         self.setupUI()
         self.show()
         
-        
     def setupUI(self):
         self.client_table.doubleClicked.connect(self.tableWidget_doubleClicked)
         self.client_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.serverwindow = MainServer()
-        self.cam_signal.connect(self.serverwindow.click_event) # 시그널 연결
-        
+        #self.cam_signal.connect(self.serverwindow.click_event) #시그널 연결
+        self.serverwindow.stop_image.connect(self.stop_listen)
         self.serverwindow.changePixmap.connect(self.setImage)
-        self.serverwindow.sendMessage.connect(self.setText)
         self.serverwindow.start()
         
     def tableWidget_doubleClicked(self):
+        global select_client_ip
+
         row = self.client_table.currentIndex().row()
     
         # 더블클릭시 클라이언트 이름 따오기
         client_IP = self.client_table.item(row, 4).text()
+        select_client_ip = client_IP
+        print(select_client_ip)
         self.client_num = self.client_table.item(row, 0).text()
         self.client_name= self.client_table.item(row, 1).text()
         self.client_mix=self.client_num+'_'+self.client_name
-        self.cam_signal.emit(client_IP) # ip를 signal로 넘김
+        #self.cam_signal.emit(client_IP) # ip를 signal로 넘김
+        self.image_label.clear()
         self.whose_graph.emit(self.client_mix)
         
         # my_list=[]
@@ -144,21 +144,25 @@ class Host_window(QWidget, form_class):
         
         for i in reversed(range(self.Graph_layout.count())):
             self.Graph_layout.removeItem(self.Graph_layout.itemAt(i))
+
         self.Graph_layout.addWidget(self.myGUI.myFig)
-        
+    
+    
             
             
     @pyqtSlot(QImage)
     def setImage(self, image):
         self.image_label.setPixmap(QPixmap.fromImage(image))
         self.image_label.update()
+    
 
-    @pyqtSlot(str)
-    def setText(self, text) :
-        self.message_TextBrowser.setTextColor(QColor(0, 0, 0))
-        self.message_TextBrowser.append(text)
-        self.message_TextBrowser.update()
-        
+    @pyqtSlot(str)##없음
+    def stop_listen(self,str_stop):
+        self.str_stop=str_stop
+        if self.str_stop=="stop":
+                self.image_label.clear()
+
+
     @pyqtSlot(dict)
     def timeout(self, users):
         
@@ -166,191 +170,125 @@ class Host_window(QWidget, form_class):
         self.client_table.setColumnCount(6)
         self.client_table.setColumnHidden(4, True)
         self.client_table.setColumnHidden(5, True)
-        self.client_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        
-        #애초에 소팅 설정해두면 에러가 나서 끊어주고 데이터 넣고 다시 True로 바꿔줌.    
+        # self.client_table.resizeRowToContents(2)
+        # self.client_table.resizeColumnToContents(2)
+        #애초에 소팅 설정해두면 에러가 나서 끊어주고 데이터 넣고 다시 True로 바꿔줌.
         self.client_table.setSortingEnabled(False)
 
         for i,each in enumerate(users.keys()):
-            try:
-                self.a=float(users[each]['log'][-1])
-            except:
-                pass
-   
+            a=random.randint(1,100)
             #집중도 숫자로 표현
-            concentration_rate=QTableWidgetItem()
-            my_status=QTableWidgetItem()
-          
+            item_refresh = QTableWidgetItem()
+            # item_refresh.setData(Qt.DisplayRole, int(exlist[i])) #숫자로 설정 (정렬을 위해)
+            item_refresh.setData(Qt.DisplayRole, a)
+
             #집중도에 따른 색상 변경
-            if self.a>0.6:
-            
-                concentration_rate.setData(Qt.DisplayRole, '상')
-                concentration_rate.setForeground(QBrush(QColor(50, 205, 50)))
-                concentration_rate.setFont(QFont("Arial", 10))
-                             
-            elif self.a>0.4:
-                
-                concentration_rate.setData(Qt.DisplayRole, '중')
-                concentration_rate.setForeground(QBrush(QColor(247 , 230, 0)))
-                concentration_rate.setFont(QFont("Arial", 10))
-                          
+            if a>60:
+                item_refresh.setForeground(QBrush(QColor(50, 205, 50)))
+                item_refresh.setFont(QFont("Arial", 10))
+            elif a>40:
+                item_refresh.setForeground(QBrush(QColor(247 , 230, 0)))
+                item_refresh.setFont(QFont("Arial", 10))
             else:
-               
-                    
-         
-                concentration_rate.setData(Qt.DisplayRole, '하')
-                concentration_rate.setForeground(QBrush(QColor(255, 0, 0)))
-
-                
-                student_num,student_name=each.split('_')
-        
-                text="학번: {} 이름: {} 집중도 주의 요망.".format(student_num,student_name)
-                self.message_TextBrowser.setTextColor(QColor(255, 51, 0))
-                
-            
-                self.message_TextBrowser.append(text)
-                self.message_TextBrowser.update()
-            
-            if users[each]['status']=='normal':
-               
-                my_status.setData(Qt.DisplayRole, 'Normal')
-                my_status.setForeground(QBrush(QColor(50, 205, 50)))
-                my_status.setFont(QFont("Arial", 10))
-            else:
-               
-                student_num,student_name=each.split('_')
-                text="학번: {} 이름: {} 주의 산만.".format(student_num,student_name)   
-                self.message_TextBrowser.setTextColor(QColor(255, 51, 0))     
-                self.message_TextBrowser.append(text)
-                self.message_TextBrowser.update()
-                    
-                    
-                my_status.setData(Qt.DisplayRole, users[each]['status'])
-                my_status.setForeground(QBrush(QColor(255, 0, 0)))
-                my_status.setFont(QFont("Arial", 10, QFont.Bold))
-
+                item_refresh.setForeground(QBrush(QColor(255, 0, 0)))
+                # item_refresh.setFont(QFont("Times", 7, QFont.Bold))
+                item_refresh.setFont(QFont("Arial", 10, QFont.Bold))
 
             self.client_table.setItem(i,0,QTableWidgetItem(users[each]['info']['학번']))
             self.client_table.setItem(i,1,QTableWidgetItem(users[each]['info']['이름']))
-            self.client_table.setItem(i,2, concentration_rate)
-            self.client_table.setItem(i,3,my_status)
+            self.client_table.setItem(i,2, item_refresh)
             self.client_table.setItem(i,4,QTableWidgetItem(users[each]['info']['IP']))
-            self.client_table.item(i, 0).setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            self.client_table.item(i, 1).setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            self.client_table.item(i, 2).setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            self.client_table.item(i, 3).setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+            
         
         self.client_table.setSortingEnabled(True)
 
-
 class MainServer(QThread) :
+    stop_image = pyqtSignal(str)
     changePixmap = pyqtSignal(QImage)
-    stop_image=pyqtSignal(str)
-    sendMessage = pyqtSignal(str)
-    
     def __init__(self) :
-        super().__init__()
-        self.s_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self.ip = ""
-        self.ip=local_ip
-        self.port = 2500 #우선 포트 번호 2500으로 고정. 나중에 수정 가능
-        # self.s_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #다중 접속 방지
-        self.s_sock.bind((self.ip, self.port)) #ip와 port를 바인드
-        print('Socket bind complete')
-        self.s_sock.listen(100) #접속자 100명까지
-        print('Socket now listening')
-        
-        self.data = b'' ### CHANGED
-        self.payload_size = struct.calcsize("L") ### CHANGED
-        self.clicked_ip=''
 
-    #click이벤트에서 값 받아옴
-    @pyqtSlot(str)
-    def click_event(self,clicked_ip):
-        self.clicked_ip=clicked_ip
+        super().__init__()
+        global select_client_ip
+        global user_dict
+        self.id_num = 1
+        self.ip = local_ip
+        self.port = 2500 #우선 포트 번호 2500으로 고정. 나중에 수정 가능
         
+        self.key = 1
+        self.num = 0
+
+        self.server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+
+        # self.s_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #다중 접속 방지
+        self.server_socket.bind((self.ip, self.port)) #ip와 port를 바인드
+        print('Socket bind complete')
+        self.server_socket.listen(100) #접속자 100명까지
+        print('Socket now listening')
+
+    
     # 쓰레드에서 실행되는 코드입니다. 
     # 접속한 클라이언트마다 새로운 쓰레드가 생성되어 통신을 하게 됩니다. 
-    def threaded(self,client_socket, addr): 
-
-        print('Connected by :', addr[0], ':', addr[1]) 
-        text_msg = "클라이언트 ip : {} / port : {} 연결되었습니다.".format(str(addr[0]), str(addr[1])) 
-        self.sendMessage.emit(text_msg)
-        # 클라이언트가 접속을 끊을 때 까지 반복합니다. 
-        while True: 
-            #click이벤트 받으면 그 사람의 소켓번호 들고옴
-            try:
-                # 데이터가 수신되면 클라이언트에 다시 전송합니다.(에코)
-                self.data = client_socket.recv(4096)
-                # if self.data=='stop':
-                #     print('Disconnected by ' + addr[0],':',addr[1])
-                #     del(clients[addr[0]])
-                #     print(clients)
-                #     break
-                
-                if not self.data: 
-                    print('Disconnected by ' + addr[0],':',addr[1])
-                    text_msg = "클라이언트 ip : {} / port : {} 나갔습니다.".format(str(addr[0]), str(addr[1])) 
-                    del(clients[addr[0]])
-                    self.sendMessage.emit(text_msg)
-                    break
-    
-                # Retrieve message size
-                while len(self.data) < self.payload_size:
-                    self.data +=  self.client_socket.recv(4096)
-
-                packed_msg_size = self.data[:self.payload_size]
-                self.data = self.data[self.payload_size:]
-                msg_size = struct.unpack("L", packed_msg_size)[0] ### CHANGED
-
-                # Retrieve all data based on message size
-                while len(self.data) < msg_size:
-                    self.data +=  self.client_socket.recv(4096)
-
-                self.frame_data = self.data[:msg_size]
-                self.data = self.data[msg_size:]
-
-                # Extract frame
-                self.frame = pickle.loads(self.frame_data)
-                self.image = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
-                # get image infos
-                height, width, channel = self.image.shape
-                step = channel * width
-                # create QImage from image
-                self.qImg = QImage(self.image.data, width, height, step, QImage.Format_RGB888)
-                
-                # show image in img_label
-                self.changePixmap.emit(self.qImg)
-                
-          
-
-                        
-            except ConnectionResetError as e:
-                
-                print('Disconnected by ' + addr[0],':',addr[1])
-                text_msg = "클라이언트 ip : {} / port : {} 나갔습니다.".format(str(addr[0]), str(addr[1])) 
-                del(clients[addr[0]])
-                self.sendMessage.emit(text_msg)
-                print(clients)
-                break
-      
-                
-        client_socket.close() 
-
     def run(self):
+        global user_dict
         while True:
-            print('wait')
-            self.client_socket, self.addr = self.s_sock.accept() 
-            # start_new_thread(self.threaded, (self.client_socket, self.addr))
-            t = threading.Thread(target=self.threaded, args=(self.client_socket, self.addr)) 
-            t.daemon = True 
-            t.start()
+
+            client_socket, address = self.server_socket.accept()
+            print('클라이언트 ip 주소 :', address[0],"연결 되었습니다.")
+            print("클라이언트 id ",str(self.id_num),'을 부여합니다.')
+            user_dict[address[0]] = self.id_num
+            client_th = threading.Thread(target = self.receive_data,args= (client_socket, self.id_num))
+            client_th.start()
+            self.id_num += 1
+            
+            print(user_dict[address[0]])
+
+            #print("시발")
+    #클라이언트 쓰레드 생성
+    def receive_data(self, client_socket,id_num):
+        key2 = 1
+        data_buffer = b""# calcsize : 데이터의 크기(byte)
+        data_size = struct.calcsize("L") ### CHANGED# - L : 부호없는 긴 정수(unsigned long) 4 bytes
+
+        while True:
+            while len(data_buffer) < data_size:
+                # 데이터 수신
+             
+                data_buffer += client_socket.recv(4096)
+      
+            packed_data_size = data_buffer[:data_size]
+            data_buffer = data_buffer[data_size:]
+            frame_size = struct.unpack(">L", packed_data_size)[0]
+        
+            while len(data_buffer) < frame_size:
+            
+                data_buffer += client_socket.recv(4096)
+            # 프레임 데이터 분할
 
 
-            print(clients)
-            if self.client_socket not in clients.values() :
-                clients[self.addr[0]]=self.client_socket #클라이언트 딕셔너리에 클라이언트가 없다면 추가 
-                print(clients)
+            key2 = -1
+            frame_data = data_buffer[:frame_size]
+            data_buffer = data_buffer[frame_size:]
+            frame = pickle.loads(frame_data)
+            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                
+            height, width, channel = image.shape
+            step = channel * width
+            
+            qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+            if(user_dict[select_client_ip] == id_num) :
+
+                print(str(id_num)+'과 연결 되었습니다.')    
+                self.changePixmap.emit(qImg)
+            else:
+                    if(key2 != 1):
+                        self.reboot(client_socket,id_num)
+                        break
+
+    def reboot(self,socket2,id_num2):
+        th = threading.Thread(target = self.receive_data,args= (socket2,id_num2))
+        th.start()
 
 if __name__ =='__main__':
     app = QApplication(sys.argv)
