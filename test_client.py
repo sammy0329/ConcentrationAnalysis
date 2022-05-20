@@ -20,6 +20,8 @@ import torch
 from model.models.resmasking import resmasking50_dropout1
 from torchvision.transforms import transforms
 import torch.nn.functional as F
+from PyQt5.QtCore import QCoreApplication
+from PyQt5 import QtWidgets
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
@@ -32,8 +34,8 @@ seg_model = torch.load(model_path)
 seg_model.eval()
 
 hostname = gethostname()
-# local_ip= gethostbyname(hostname)
-local_ip=get('https://api.ipify.org').text
+local_ip= gethostbyname(hostname)
+# local_ip=get('https://api.ipify.org').text
 transform = transforms.Compose(
             [
                 transforms.ToPILImage(),
@@ -135,16 +137,35 @@ class SendVideo(QThread):
         self.cap = cv_cap
         self.ip=server_ip
 
+    
+        
+    def closeEvent(self):
+    
+        QMessageBox.question(self, 'Message', 'Host가 회의를 종료했습니다.',
+                                     QMessageBox.Yes , QMessageBox.Yes)
+
+      
+            
+            
     def send_video(self) : #서버(호스트)로부터 요청을 받았을 때 영상을 전송해주는 함수
-        while True:
-            # self.server_socket, self.addr = self.soc.accept()
+        try:
+            while True:
+                # self.server_socket, self.addr = self.soc.accept()
+                    
+                ret,frame=self.cap.read()
+                    # Serialize frame
+                retval, frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])    
+                frame = pickle.dumps(frame)
+                self.soc.sendall(struct.pack(">L", len(frame)) + frame)
+                # print("보내는중")
                 
-            ret,frame=self.cap.read()
-                # Serialize frame
-            retval, frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 90])    
-            frame = pickle.dumps(frame)
-            self.soc.sendall(struct.pack(">L", len(frame)) + frame)
-            print("보내는중")
+        except ConnectionResetError as e:
+            self.soc.close()
+            #QtWidgets.QMessageBox.critical(self, "QMessageBox", "QMessageBox Error")
+            QCoreApplication.quit()
+            
+            
+            
            
 
     def run(self):    
@@ -155,11 +176,10 @@ class SendVideo(QThread):
         self.myip=local_ip
         self.soc.connect( (host, port) ) # 서버측으로 연결한다.
         print("연결 성공")
-        # print (soc.recv(1024)) # 서버측에서 보낸 데이터 1024 버퍼만큼 받는다.
+
         self.send_video()
 
-        # self.soc.send("Client. Hello!!!") # 서버측으로 문자열을 보낸다.
-        # self.soc.close() # 연결 종료
+  
 
 class Client_info_window(QWidget, client_info_form_class):
     def __init__(self, dir_name, server_ip):

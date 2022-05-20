@@ -1,4 +1,5 @@
-from test_server import *
+# from test_server import *
+from test_host import *
 from test_client import *
 from cryptography.fernet import Fernet
 import json
@@ -31,10 +32,10 @@ class MyWindow(QMainWindow, mainform_class):
             self.class_serverip=self.classname+'@'+ self.host_window.local_ip
             
             self.encrypt_text=cipher_suite.encrypt(self.class_serverip.encode())
-            # plain_text = cipher_suite.decrypt(encrypt_text)
+            
             self.host_window.code_text.setText(self.encrypt_text.decode('utf-8'))
             print(self.encrypt_text.decode('utf-8'))
-            # print(plain_text)
+         
         else:
             self.show()
 
