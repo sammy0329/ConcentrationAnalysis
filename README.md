@@ -36,9 +36,17 @@
 
 5. host link를 이용하여 client는 host에 접속
 
+![image](https://user-images.githubusercontent.com/38833676/169654542-d807895d-f502-4b5a-92c9-91755a1e0570.png)
+
+(link 입력)
+
 
 ![image](https://user-images.githubusercontent.com/38833676/169654221-39257201-8eb8-424c-9096-0577a80153fd.png)
 
 (client 정보 입력)
+
+6.접속 결과
+![image](https://user-images.githubusercontent.com/38833676/169654711-4eacd27d-ed96-4464-8892-c1f83299ed61.png)
+
 
 
