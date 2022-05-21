@@ -46,7 +46,9 @@
 (client 정보 입력)
 
 6.접속 결과
-![image](https://user-images.githubusercontent.com/38833676/169654711-4eacd27d-ed96-4464-8892-c1f83299ed61.png)
+
+![ㅇㅇㅇ](https://user-images.githubusercontent.com/38833676/169654794-ea03d74b-c139-4b1d-bd0f-7002c0ac3933.png)
+
 
 
 
