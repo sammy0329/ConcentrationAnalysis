@@ -5,6 +5,13 @@
 
 ![image](https://user-images.githubusercontent.com/38833676/169653443-ae7c9cb3-a0c3-48f7-91cb-cc2b4c31200e.png)
 
+딥러닝을 사용한 얼굴 감정 인식을 통해 감정 분석 결과를 집중도 가중치를 이용하여 집중도로 환산 그리고 얼굴 인식 모델을 통한 예외 상태(자리 비움, 졸음 상태)를 감지하고
+이를 호스트(교수,강사,선생님)에게 제공함으로서 화상회의(수업)에서 학생 전체의 상태를 확인하고 피드백 가능하도록 하게 할 수 있다.
+
+# 필요 라이브러리
+
+
+
 
 # 사용법
 
@@ -13,10 +20,11 @@
 
 1. 모델 다운로드 후 모델 파일을 C:drive 최상위로 이동
 
+
 2.main.py를 실행
 
-3.client or host 선택
 
+3.client or host 선택
 
 
 ![image](https://user-images.githubusercontent.com/38833676/169653835-35171f96-27e8-4052-946d-5faba838abc0.png)
