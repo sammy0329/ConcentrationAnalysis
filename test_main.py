@@ -18,6 +18,12 @@ class MyWindow(QMainWindow, mainform_class):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+
+        bg_img = QImage("ui/img/main.jpg")
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, QBrush(bg_img))
+        self.setPalette(palette)
+        
         self.host_btn.clicked.connect(self.button_host)
         self.client_btn.clicked.connect(self.button_client)
     
