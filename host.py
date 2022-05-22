@@ -1,16 +1,16 @@
-from graph import *
+import sys
+import cv2
+import time
+import socket
+import pickle
+import struct
 import db_auth as dbs
 from firebase_admin import db
-import time
-import sys
+from graph import *
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-import socket
-import cv2
 from PyQt5.QtGui import QPixmap
-import pickle
-import struct
 from _thread import *
 
 form_class = uic.loadUiType('./ui/host.ui')[0]
@@ -116,6 +116,12 @@ class Host_window(QWidget, form_class):
         self.cli.start()
         self.cli.timeout.connect(self.timeout) # 시그널 슬롯 등록
         self.whose_graph.connect(self.cli.whosename)
+
+        bg_img = QImage("ui/img/host.jpg")
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, QBrush(bg_img))
+        self.setPalette(palette)
+
         self.setupUI()
         self.show()
         

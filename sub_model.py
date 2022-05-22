@@ -54,14 +54,11 @@ class sub_model(QThread):
                 if ratioAvg>32 :
                     self.initialization()
                     self.status_change("normal")
-                    print("check1")
                 else :
                     self.blinkCounter += 1
 
                 if self.blinkCounter > 1000 :
                     self.status_change("sleeping")
-                    print("check2")
 
             else:
                 self.status_change("leaving")
-                print("check3")
