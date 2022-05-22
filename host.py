@@ -26,6 +26,7 @@ select_client_ip = "main"
 global user_dict
 user_dict = {"main":0}
 
+
 class Clientclass(QThread):
     timeout = pyqtSignal(dict) # 사용자 정의 시그널
     
@@ -104,6 +105,7 @@ class Clientclass(QThread):
 
 class Host_window(QWidget, form_class):
     whose_graph = pyqtSignal(str)
+    
     def __init__(self,classname):
         super().__init__()
         self.local_ip=socket.gethostbyname(hostname)
@@ -139,7 +141,13 @@ class Host_window(QWidget, form_class):
         self.client_mix=self.client_num+'_'+self.client_name
         # self.image_label.clear()
         self.whose_graph.emit(self.client_mix)
+       
         
+        
+        self.student_name_label.setText(self.client_name)
+    
+        self.student_num_label.setText(self.client_num)
+       
      
        
         self.myGUI = CustomMainWindow()
@@ -182,7 +190,7 @@ class Host_window(QWidget, form_class):
             
             #애초에 소팅 설정해두면 에러가 나서 끊어주고 데이터 넣고 다시 True로 바꿔줌.    
             self.client_table.setSortingEnabled(False)
-
+            
             for i,each in enumerate(users.keys()):
                 try:
                     self.a=float(users[each]['log'][-1])
@@ -207,7 +215,7 @@ class Host_window(QWidget, form_class):
                     concentration_rate.setFont(QFont("Arial", 10))
                             
                 else:      
-            
+                    
                     concentration_rate.setData(Qt.DisplayRole, '하')
                     concentration_rate.setForeground(QBrush(QColor(255, 0, 0)))
 
@@ -228,13 +236,13 @@ class Host_window(QWidget, form_class):
                     my_status.setFont(QFont("Arial", 10))
                 elif users[each]['status']=='leaving':
                 
+                    
                     student_num,student_name=each.split('_')
                     text="학번: {} 이름: {} 자리 비움".format(student_num,student_name)   
                     self.message_TextBrowser.setTextColor(QColor(255, 51, 0))     
                     self.message_TextBrowser.append(text)
                     self.message_TextBrowser.update()
-                        
-                        
+                             
                     my_status.setData(Qt.DisplayRole, users[each]['status'])
                     my_status.setForeground(QBrush(QColor(255, 0, 0)))
                     my_status.setFont(QFont("Arial", 10, QFont.Bold))
@@ -242,7 +250,7 @@ class Host_window(QWidget, form_class):
                     my_status.setData(Qt.DisplayRole, users[each]['status'])
                     my_status.setForeground(QBrush(QColor(255, 0, 0)))
                     my_status.setFont(QFont("Arial", 10, QFont.Bold))
-
+                    
 
                 self.client_table.setItem(i,0,QTableWidgetItem(users[each]['info']['학번']))
                 self.client_table.setItem(i,1,QTableWidgetItem(users[each]['info']['이름']))

@@ -1,4 +1,3 @@
-# from test_server import *
 from host import *
 from client import *
 from cryptography.fernet import Fernet

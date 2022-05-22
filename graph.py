@@ -1,11 +1,8 @@
 import sys
-import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-import functools
 import numpy as np
-import random as rd
 import matplotlib
 matplotlib.use("Qt5Agg")
 import matplotlib as plt
