@@ -1,7 +1,7 @@
-import json
 from host import *
 from client import *
 from cryptography.fernet import Fernet
+import json
 
 key_path = "resource/encoding_key.json"
 
@@ -17,12 +17,12 @@ class MyWindow(QMainWindow, mainform_class):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        
+
         bg_img = QImage("ui/img/main.jpg")
         palette = QPalette()
         palette.setBrush(QPalette.Window, QBrush(bg_img))
         self.setPalette(palette)
-
+        
         self.host_btn.clicked.connect(self.button_host)
         self.client_btn.clicked.connect(self.button_client)
     
@@ -33,18 +33,21 @@ class MyWindow(QMainWindow, mainform_class):
        
         if ok:
             self.host_window=Host_window(self.classname)
+            
             self.class_serverip=self.classname+'@'+ self.host_window.local_ip
+            
             self.encrypt_text=cipher_suite.encrypt(self.class_serverip.encode())
+            
             self.host_window.code_text.setText(self.encrypt_text.decode('utf-8'))
-
             print(self.encrypt_text.decode('utf-8'))
+         
         else:
             self.show()
 
-    def button_client(self):
-        self.hide()
         
-        self.encrypt_text, ok = QInputDialog.getText(self, '수업 입장', '수업 코드를 입력하세요:')
+    def button_client(self):
+        self.hide()        
+        self.encrypt_text, ok = QInputDialog.getText(self, 'Input Link', 'Enter your Link:')
 
         if ok:
             self.decrypt_text = cipher_suite.decrypt(self.encrypt_text.encode('utf-8'))
