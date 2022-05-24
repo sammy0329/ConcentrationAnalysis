@@ -108,6 +108,11 @@ class Host_window(QWidget, form_class):
     
     def __init__(self,classname):
         super().__init__()
+        bg_img = QImage("ui/img/host.jpg")
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, QBrush(bg_img))
+        self.setPalette(palette)
+
         self.local_ip=socket.gethostbyname(hostname)
         self.setupUi(self)
         self.classname=classname
@@ -117,7 +122,6 @@ class Host_window(QWidget, form_class):
         self.whose_graph.connect(self.cli.whosename)
         self.setupUI()
         self.show()
-        
         
     def setupUI(self):
         self.client_table.doubleClicked.connect(self.tableWidget_doubleClicked)
