@@ -3,7 +3,7 @@ import time
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QImage
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QImage, QPixmap, QPalette, QBrush
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import QThread
 import tensorflow as tf
@@ -21,7 +21,6 @@ from model.models.resmasking import resmasking50_dropout1
 from torchvision.transforms import transforms
 import torch.nn.functional as F
 from PyQt5.QtCore import QCoreApplication
-from PyQt5 import QtWidgets
 
 client_form_class = uic.loadUiType("./ui/client.ui")[0]
 client_info_form_class = uic.loadUiType("./ui/client_info.ui")[0]
@@ -93,6 +92,13 @@ class Client_window(QWidget,client_form_class):
     def __init__(self,server_ip, base_dir):
         # call QWidget constructor
         super().__init__()
+
+        bg_img = QImage("ui/img/client.jpg")
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, QBrush(bg_img))
+        self.setPalette(palette)
+
+
         self.server_ip=server_ip
         self.setupUi(self)
         self.cap = cv2.VideoCapture(0)
