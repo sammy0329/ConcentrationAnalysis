@@ -304,6 +304,7 @@ class MainServer(QThread) :
     
     #클라이언트 쓰레드 생성
     def receive_data(self, client_socket,id_num,address):
+        global select_client_ip
         key2 = 1
         data_buffer = b""# calcsize : 데이터의 크기(byte)
         data_size = struct.calcsize("L") ### CHANGED# - L : 부호없는 긴 정수(unsigned long) 4 bytes
@@ -351,9 +352,11 @@ class MainServer(QThread) :
             
             text_msg = "클라이언트 ip : {} 연결이 끊겼습니다.".format(str(ip)) 
             self.sendMessage.emit(text_msg)
-            self.stop_image.emit('stop')
+            
             del(clients[address[0]])
-            select_client_ip=''
+            if select_client_ip==address[0]:
+                select_client_ip = "main"
+                self.stop_image.emit('stop')
             print(clients)
             
 
