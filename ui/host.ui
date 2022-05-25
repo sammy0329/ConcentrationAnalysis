@@ -25,7 +25,7 @@
    <property name="font">
     <font>
      <family>나눔스퀘어 Bold</family>
-     <pointsize>10</pointsize>
+     <pointsize>11</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
@@ -308,7 +308,6 @@ p, li { white-space: pre-wrap; }
   <zorder>message_TextBrowser</zorder>
   <zorder>UserCam_box</zorder>
   <zorder>client_table</zorder>
-  <zorder>splitter_2</zorder>
  </widget>
  <resources/>
  <connections/>
