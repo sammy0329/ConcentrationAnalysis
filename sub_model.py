@@ -37,7 +37,7 @@ class sub_model(QThread):
             if faces:
                 face = faces[0]
                 self.status_change("normal")
-                leftUp = face[27]
+                leftUp = face[159]
                 leftDown = face[23]
                 leftLeft = face[130]
                 leftRight = face[243]
@@ -50,14 +50,16 @@ class sub_model(QThread):
                 if len(self.ratioList) > 3:
                     self.ratioList.pop(0)
                 ratioAvg=sum(self.ratioList) / len(self.ratioList)
-
+         
                 if ratioAvg>32 :
                     self.initialization()
                     self.status_change("normal")
                 else :
                     self.blinkCounter += 1
-
-                if self.blinkCounter > 1000 :
+                    print(self.blinkCounter)
+                
+                #test를 위해 시간 최소화
+                if self.blinkCounter > 50:
                     self.status_change("sleeping")
 
             else:
