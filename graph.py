@@ -15,6 +15,8 @@ import threading
 from PyQt5 import uic
 import random
 
+plt.rcParams['font.family'] = 'Malgun Gothic'
+
 form_class1 = uic.loadUiType('./ui/graph.ui')[0]
 
 class CustomMainWindow(QWidget,form_class1):
@@ -54,7 +56,7 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         
         # self.ax1 settings
         self.ax1.set_xlabel('Time', fontweight='bold')
-        self.ax1.set_ylabel('Concentration Score', fontweight='bold')
+        self.ax1.set_ylabel('집중도', fontweight='bold')
         self.line1 = Line2D([], [], color='blue')
         self.line1_tail = Line2D([], [], color='red', linewidth=2)
         self.line1_head = Line2D([], [], color='red', marker='o', markeredgecolor='r')

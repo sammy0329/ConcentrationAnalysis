@@ -32,8 +32,9 @@ seg_model = torch.load(model_path)
 seg_model.eval()
 
 hostname = gethostname()
-local_ip= gethostbyname(hostname)
-# local_ip=get('https://api.ipify.org').text
+# local_ip= gethostbyname(hostname)
+local_ip=get('https://api.ipify.org').text
+print(local_ip)
 transform = transforms.Compose(
             [
                 transforms.ToPILImage(),
@@ -204,6 +205,7 @@ class Client_info_window(QWidget, client_info_form_class):
         dbs.dir.update(self.query)
         
         self.query = "{{'{}':'{}'}}".format("IP", self.SutdentIP)
+        print(self.SutdentIP)
         self.query = eval(self.query)
         dbs.dir.update(self.query)
 
