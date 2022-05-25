@@ -204,7 +204,7 @@ class Host_window(QWidget, form_class):
                     concentration_rate.setForeground(QBrush(QColor(50, 205, 50)))
                     concentration_rate.setFont(QFont("Arial", 10))
                                 
-                elif self.a>0.4:         
+                elif self.a>0.3:         
                     concentration_rate.setData(Qt.DisplayRole, '중')
                     concentration_rate.setForeground(QBrush(QColor(247 , 230, 0)))
                     concentration_rate.setFont(QFont("Arial", 10))
@@ -353,10 +353,9 @@ class MainServer(QThread) :
             self.sendMessage.emit(text_msg)
             self.stop_image.emit('stop')
             del(clients[address[0]])
+            select_client_ip=''
             print(clients)
             
-
-
 
 if __name__ =='__main__':
     app = QApplication(sys.argv)

@@ -34,7 +34,10 @@ seg_model.eval()
 hostname = gethostname()
 # local_ip= gethostbyname(hostname)
 local_ip=get('https://api.ipify.org').text
+<<<<<<< HEAD
 print(local_ip)
+=======
+>>>>>>> 5619a8a518908cb082c94ac725fefbf4f3aa28e4
 transform = transforms.Compose(
             [
                 transforms.ToPILImage(),
