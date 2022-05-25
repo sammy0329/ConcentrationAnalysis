@@ -53,11 +53,8 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         self.ax1 = self.fig.add_subplot(111)
         
         # self.ax1 settings
-<<<<<<< HEAD
-        self.ax1.set_xlabel('Time', fontweight='bold')
-=======
+
         self.ax1.set_xlabel('시간', fontweight='bold')
->>>>>>> 5619a8a518908cb082c94ac725fefbf4f3aa28e4
         self.ax1.set_ylabel('집중도', fontweight='bold')
         self.line1 = Line2D([], [], color='blue')
         self.line1_tail = Line2D([], [], color='red', linewidth=2)
