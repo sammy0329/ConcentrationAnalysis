@@ -13,7 +13,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import time
 import threading
 from PyQt5 import uic
-import random
+plt.rcParams['font.family'] = 'Malgun Gothic'
+
 
 form_class1 = uic.loadUiType('./ui/graph.ui')[0]
 
@@ -28,9 +29,6 @@ class CustomMainWindow(QWidget,form_class1):
       
         self.myFig = CustomFigCanvas()
 
-        # Add the callbackfunc to ..
-        # myDataLoop = threading.Thread(name = 'myDataLoop', target = dataSendLoop, daemon = True, args = (self.addData_callbackFunc,))
-        # myDataLoop.start()
         return 
 
     def addData_callbackFunc(self, value):
@@ -53,8 +51,8 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         self.ax1 = self.fig.add_subplot(111)
         
         # self.ax1 settings
-        self.ax1.set_xlabel('Time', fontweight='bold')
-        self.ax1.set_ylabel('Concentration Score', fontweight='bold')
+        self.ax1.set_xlabel('시간', fontweight='bold')
+        self.ax1.set_ylabel('집중도', fontweight='bold')
         self.line1 = Line2D([], [], color='blue')
         self.line1_tail = Line2D([], [], color='red', linewidth=2)
         self.line1_head = Line2D([], [], color='red', marker='o', markeredgecolor='r')
@@ -83,15 +81,6 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         print(self.addedData)
         return
 
-    # def _step(self, *args):
-    #     try:
-    #         TimedAnimation._step(self, *args)
-    #     except Exception as e:
-    #         self.abc += 1
-    #         print(str(self.abc))
-    #         TimedAnimation._stop(self)
-    #         pass
-    #     return
 
     def _draw_frame(self, framedata):
         margin = 2
@@ -106,31 +95,9 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
         self._drawn_artists = [self.line1, self.line1_tail, self.line1_head]
         return
 
-# class Communicate(QObject):
-#     data_signal = pyqtSignal(float)
-
-# @pyqtSlot(dict)
-# def dataSendLoop(addData_callbackFunc):
-#     mySrc = Communicate()
-#     mySrc.data_signal.connect(addData_callbackFunc)
-    
-#     n = np.linspace(0, 499, 500)
-#     # y = 50 + 25*(np.sin(n / 8.3)) + 10*(np.sin(n / 7.5)) - 5*(np.sin(n / 1.5))
-#     y=[]
-#     for i in range(100):
-#         y.append(random.randint(0,100))
-#     i = 0
-
-#     while(True):
-#         if(i > 60):
-#             break
-#         time.sleep(0.1)
-#         # time.sleep(0.5)
-#         mySrc.data_signal.emit(y[i]) # <- Here you emit a signal!
-#         i += 1
 
 if __name__== '__main__':
     app = QApplication(sys.argv)
-    # QApplication.setStyle(QStyleFactory.create('Plastique'))
+
     myGUI = CustomMainWindow()
     sys.exit(app.exec_())

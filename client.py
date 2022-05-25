@@ -32,8 +32,8 @@ seg_model = torch.load(model_path)
 seg_model.eval()
 
 hostname = gethostname()
-local_ip= gethostbyname(hostname)
-# local_ip=get('https://api.ipify.org').text
+# local_ip= gethostbyname(hostname)
+local_ip=get('https://api.ipify.org').text
 transform = transforms.Compose(
             [
                 transforms.ToPILImage(),
