@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>학생 정보 입력</string>
   </property>
   <widget class="QPushButton" name="commit_btn">
    <property name="geometry">
@@ -21,6 +21,12 @@
      <width>81</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>입장</string>
@@ -45,8 +51,10 @@
     <widget class="QLabel" name="label_2">
      <property name="font">
       <font>
-       <family>휴먼모음T</family>
-       <pointsize>11</pointsize>
+       <family>나눔스퀘어 Bold</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="text">
@@ -62,8 +70,10 @@
     <widget class="QLabel" name="label_3">
      <property name="font">
       <font>
-       <family>휴먼모음T</family>
-       <pointsize>11</pointsize>
+       <family>나눔스퀘어 Bold</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="text">

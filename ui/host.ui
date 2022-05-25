@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>1172</width>
-    <height>1008</height>
+    <height>1007</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>선생님용</string>
   </property>
   <widget class="QGroupBox" name="Concentration_box">
    <property name="geometry">
@@ -22,8 +22,16 @@
      <height>261</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어 Bold</family>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="title">
-    <string>Concentration Graph</string>
+    <string>집중도 그래프</string>
    </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
@@ -46,21 +54,37 @@
      <height>591</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어 Bold</family>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="title">
-    <string>Client Info</string>
+    <string>학생별 상태</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>32</y>
+     <y>30</y>
      <width>441</width>
-     <height>61</height>
+     <height>91</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어 Bold</family>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="title">
-    <string>Link</string>
+    <string>수업 링크</string>
    </property>
    <widget class="QTextEdit" name="code_text">
     <property name="geometry">
@@ -68,8 +92,16 @@
       <x>20</x>
       <y>20</y>
       <width>401</width>
-      <height>31</height>
+      <height>61</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어</family>
+      <pointsize>9</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -80,9 +112,9 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>610</y>
+     <y>630</y>
      <width>421</width>
-     <height>331</height>
+     <height>311</height>
     </rect>
    </property>
    <property name="html">
@@ -97,13 +129,21 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>100</y>
+     <y>130</y>
      <width>441</width>
      <height>461</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어 Bold</family>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="title">
-    <string>Cam</string>
+    <string>학생 카메라</string>
    </property>
    <widget class="QLabel" name="image_label">
     <property name="geometry">
@@ -123,13 +163,21 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>570</y>
+     <y>600</y>
      <width>441</width>
-     <height>391</height>
+     <height>361</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어 Bold</family>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="title">
-    <string>Message</string>
+    <string>학생별 알림</string>
    </property>
   </widget>
   <widget class="QTableWidget" name="client_table">
@@ -182,30 +230,72 @@ p, li { white-space: pre-wrap; }
      <height>61</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어 Bold</family>
+     <pointsize>11</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="title">
     <string>학생 정보</string>
    </property>
    <widget class="QSplitter" name="splitter_3">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>10</y>
       <width>541</width>
       <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>나눔스퀘어</family>
+      <pointsize>11</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="handleWidth">
+     <number>0</number>
+    </property>
+    <property name="childrenCollapsible">
+     <bool>true</bool>
     </property>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="opaqueResize">
+      <bool>true</bool>
+     </property>
+     <property name="handleWidth">
+      <number>5</number>
+     </property>
      <widget class="QLabel" name="label">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>218</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="font">
        <font>
-        <family>맑은 고딕</family>
+        <family>나눔스퀘어</family>
         <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="text">
@@ -215,10 +305,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="student_num_label">
       <property name="font">
        <font>
-        <family>맑은 고딕</family>
-        <pointsize>11</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <family>나눔스퀘어</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="text">
@@ -233,11 +323,22 @@ p, li { white-space: pre-wrap; }
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="handleWidth">
+      <number>0</number>
+     </property>
      <widget class="QLabel" name="label_2">
+      <property name="minimumSize">
+       <size>
+        <width>224</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="font">
        <font>
-        <family>맑은 고딕</family>
+        <family>나눔스퀘어</family>
         <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="text">
@@ -247,10 +348,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="student_name_label">
       <property name="font">
        <font>
-        <family>맑은 고딕</family>
-        <pointsize>11</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <family>나눔스퀘어</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="text">
@@ -271,10 +372,6 @@ p, li { white-space: pre-wrap; }
   <zorder>message_TextBrowser</zorder>
   <zorder>UserCam_box</zorder>
   <zorder>client_table</zorder>
-  <zorder>splitter</zorder>
-  <zorder>splitter_2</zorder>
-  <zorder>splitter</zorder>
-  <zorder>horizontalSpacer_3</zorder>
  </widget>
  <resources/>
  <connections/>

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>학생용</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -35,11 +35,17 @@
   <widget class="QSplitter" name="splitter_3">
    <property name="geometry">
     <rect>
-     <x>31</x>
+     <x>50</x>
      <y>20</y>
      <width>511</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>나눔스퀘어</family>
+     <pointsize>11</pointsize>
+    </font>
    </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
@@ -49,11 +55,23 @@
      <enum>Qt::Horizontal</enum>
     </property>
     <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <family>나눔스퀘어</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>학번:</string>
      </property>
     </widget>
     <widget class="QLabel" name="StudentID_label">
+     <property name="font">
+      <font>
+       <family>나눔스퀘어</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>2017204033</string>
      </property>
@@ -64,11 +82,23 @@
      <enum>Qt::Horizontal</enum>
     </property>
     <widget class="QLabel" name="label_2">
+     <property name="font">
+      <font>
+       <family>나눔스퀘어</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>이름:</string>
      </property>
     </widget>
     <widget class="QLabel" name="Name_label">
+     <property name="font">
+      <font>
+       <family>나눔스퀘어</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>안성재</string>
      </property>

@@ -133,22 +133,15 @@ class Client_window(QWidget,client_form_class):
     
 
 class SendVideo(QThread):
-
     def __init__(self, cv_cap, server_ip):
         super().__init__()
         self.cap = cv_cap
         self.ip=server_ip
-
-    
         
     def closeEvent(self):
-    
         QMessageBox.question(self, 'Message', 'Host가 회의를 종료했습니다.',
                                      QMessageBox.Yes , QMessageBox.Yes)
 
-      
-            
-            
     def send_video(self) : #서버(호스트)로부터 요청을 받았을 때 영상을 전송해주는 함수
         try:
             while True:
@@ -166,10 +159,6 @@ class SendVideo(QThread):
             #QtWidgets.QMessageBox.critical(self, "QMessageBox", "QMessageBox Error")
             QCoreApplication.quit()
             
-            
-            
-           
-
     def run(self):    
         self.soc = socket(AF_INET, SOCK_STREAM)
 
@@ -181,8 +170,6 @@ class SendVideo(QThread):
 
         self.send_video()
 
-  
-
 class Client_info_window(QWidget, client_info_form_class):
     def __init__(self, dir_name, server_ip):
         super().__init__()
@@ -190,6 +177,12 @@ class Client_info_window(QWidget, client_info_form_class):
         self.dir_name = dir_name
         self.server_ip = server_ip
         self.setupUi(self)
+
+        bg_img = QImage("ui/img/client_info2.jpg")
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, QBrush(bg_img))
+        self.setPalette(palette)
+
         self.commit_btn.clicked.connect(self.button_commit)
         self.show()
         

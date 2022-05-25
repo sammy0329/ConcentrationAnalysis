@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>test</class>
+ <widget class="QWidget" name="test">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -10,8 +10,11 @@
     <height>317</height>
    </rect>
   </property>
+  <property name="cursor">
+   <cursorShape>ArrowCursor</cursorShape>
+  </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>시작</string>
   </property>
   <widget class="QPushButton" name="host_btn">
    <property name="geometry">
@@ -24,14 +27,14 @@
    </property>
    <property name="font">
     <font>
-     <family>휴먼모음T</family>
-     <pointsize>12</pointsize>
+     <family>나눔스퀘어</family>
+     <pointsize>16</pointsize>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
    <property name="text">
-    <string>Host</string>
+    <string>선생님</string>
    </property>
   </widget>
   <widget class="QPushButton" name="client_btn">
@@ -45,12 +48,14 @@
    </property>
    <property name="font">
     <font>
-     <family>휴먼모음T</family>
-     <pointsize>12</pointsize>
+     <family>나눔스퀘어</family>
+     <pointsize>16</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
     </font>
    </property>
    <property name="text">
-    <string>Client</string>
+    <string>학생</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -64,12 +69,17 @@
    </property>
    <property name="font">
     <font>
-     <family>휴먼모음T</family>
-     <pointsize>20</pointsize>
+     <family>나눔스퀘어 Bold</family>
+     <pointsize>24</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
     </font>
    </property>
    <property name="text">
-    <string>Users Concentration Analysis</string>
+    <string>온라인 수업 집중도 분석</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>
