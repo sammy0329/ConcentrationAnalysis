@@ -35,12 +35,10 @@ class Clientclass(QThread):
         self.client_info=[] # 초깃값 설정
         self.classname=classname 
         self.graph_client_log=[]
-    #누구의 그래프를 받을지 이름 넘겨받음
     
     @pyqtSlot(str)
     def whosename(self, mix_info):
         self.mix_info=mix_info
-        # self.graph_client_name,self.graph_client_name=mix_info.split('_')
         try:
             self.graph_client_log=users[self.mix_info]['log']
             global whoosegraph
@@ -67,7 +65,7 @@ class Clientclass(QThread):
                     self.student_info_dic = self.info_dir.get()
                     users[self.student_info_dic['학번']+'_'+name]={}
                     users[self.student_info_dic['학번']+'_'+name]['info']=self.student_info_dic
-                    # print(self.student_info_dic['학번'])
+
                     
                     self.log_dir = db.reference(self.classname+"/"+name+"/"+"분석로그")
                     self.student_log = self.log_dir.get()
@@ -145,14 +143,9 @@ class Host_window(QWidget, form_class):
         self.client_mix=self.client_num+'_'+self.client_name
         # self.image_label.clear()
         self.whose_graph.emit(self.client_mix)
-       
-        
         
         self.student_name_label.setText(self.client_name)
-    
         self.student_num_label.setText(self.client_num)
-       
-     
        
         self.myGUI = CustomMainWindow()
         self.myGUI.addData_callbackFunc(whoosegraph)
@@ -207,40 +200,27 @@ class Host_window(QWidget, form_class):
             
                 #집중도에 따른 색상 변경
                 if self.a>0.6:
-                
                     concentration_rate.setData(Qt.DisplayRole, '상')
                     concentration_rate.setForeground(QBrush(QColor(50, 205, 50)))
                     concentration_rate.setFont(QFont("Arial", 10))
                                 
-                elif self.a>0.4:
-                    
+                elif self.a>0.4:         
                     concentration_rate.setData(Qt.DisplayRole, '중')
                     concentration_rate.setForeground(QBrush(QColor(247 , 230, 0)))
                     concentration_rate.setFont(QFont("Arial", 10))
                             
-                else:      
-                    
+                else:                 
                     concentration_rate.setData(Qt.DisplayRole, '하')
                     concentration_rate.setForeground(QBrush(QColor(255, 0, 0)))
 
-                    
-                    student_num,student_name=each.split('_')
-            
-                    text="학번: {} 이름: {} 집중도 경고!!.".format(student_num,student_name)
-                    self.message_TextBrowser.setTextColor(QColor(255, 51, 0))
-                    
                 
-                    self.message_TextBrowser.append(text)
-                    self.message_TextBrowser.update()
-                
-                if users[each]['status']=='normal':
-                
+                if users[each]['status']=='normal':  
                     my_status.setData(Qt.DisplayRole, 'Normal')
                     my_status.setForeground(QBrush(QColor(50, 205, 50)))
                     my_status.setFont(QFont("Arial", 10))
-                elif users[each]['status']=='leaving':
-                
                     
+                elif users[each]['status']=='leaving':
+                             
                     student_num,student_name=each.split('_')
                     text="학번: {} 이름: {} 자리 비움".format(student_num,student_name)   
                     self.message_TextBrowser.setTextColor(QColor(255, 51, 0))     
@@ -250,6 +230,7 @@ class Host_window(QWidget, form_class):
                     my_status.setData(Qt.DisplayRole, users[each]['status'])
                     my_status.setForeground(QBrush(QColor(255, 0, 0)))
                     my_status.setFont(QFont("Arial", 10, QFont.Bold))
+                    
                 else:
                     my_status.setData(Qt.DisplayRole, users[each]['status'])
                     my_status.setForeground(QBrush(QColor(255, 0, 0)))
@@ -267,6 +248,7 @@ class Host_window(QWidget, form_class):
                 self.client_table.item(i, 3).setTextAlignment(Qt.AlignCenter | Qt.AlignVCenter)
             
             self.client_table.setSortingEnabled(True)
+            
         except:
             pass
 
@@ -318,7 +300,6 @@ class MainServer(QThread) :
             client_th.start()
             self.id_num += 1
             
-            # print(user_dict[address[0]])
 
     
     #클라이언트 쓰레드 생성
@@ -342,6 +323,7 @@ class MainServer(QThread) :
                 while len(data_buffer) < frame_size:
                 
                     data_buffer += client_socket.recv(4096)
+                    
                 # 프레임 데이터 분할
 
                 key2 = -1
@@ -363,8 +345,6 @@ class MainServer(QThread) :
                     self.changePixmap.emit(qImg)
                 else:
                     if(key2 != 1):
-                        # self.reboot(client_socket,id_num)
-                        # break
                         continue
                     
         except ConnectionResetError as e:
@@ -375,11 +355,6 @@ class MainServer(QThread) :
             del(clients[address[0]])
             print(clients)
             
-            
-
-    # def reboot(self,socket2,id_num2):
-    #     th = threading.Thread(target = self.receive_data,args= (socket2,id_num2,address))
-    #     th.start()
 
 
 
